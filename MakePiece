@@ -1,0 +1,126 @@
+#!/bin/bash
+
+################################################################################
+## Steal This Piece
+## The machine that creates a machine that creates a piece (of music).
+## Written in 2012 by William Andrew Burnson andrew@williamburnson.com
+##
+## To the extent possible under law, the author(s) have dedicated all copyright
+## and related and neighboring rights to this software to the public domain
+## worldwide. This software is distributed without any warranty.
+##
+## You should have received a copy of the CC0 Public Domain Dedication along
+## with this software. If not, see:
+## <http://creativecommons.org/publicdomain/zero/1.0/>.
+##
+################################################################################
+
+#Show start time.
+echo "Began at:"
+date
+rm -rf working status done
+touch working
+
+#Display application versions.
+echo "Initializing (1 of 5)" > status
+ly="/Applications/LilyPond.app/Contents/Resources/bin/lilypond"
+mt="/Applications/Mathematica.app/Contents/MacOS/MathKernel"
+g++      --version | grep "[0-9][.]"
+$ly      --version | grep "[0-9][.]"
+fomus    --version | grep "[0-9][.]"
+timidity --version | grep "[0-9][.]"
+sox      --version | grep "[0-9][.]"
+which $mt
+
+#Clean build directories.
+rm -rf Build
+rm -rf Generated
+mkdir Build
+mkdir Generated
+
+#Build the source code.
+g++ -g -o Build/Composer Source/Composer.cpp &
+wait
+sleep 1
+
+#Compose the piece.
+echo "Composing (2 of 5)" > status
+Build/Composer
+ls
+
+#Optionally: end here.
+#exit
+
+#Generate score and analysis.
+echo "Generating score files and analysis (3 of 5)" > status
+cd Generated
+$mt -script "out.m" &
+fomus -i out.fms -o out.ly &
+fomus -i out.fms -o out.xml &
+fomus -i out.fms -o out.mid &
+wait
+sleep 1
+cd ..
+
+#Generate parts and audio file.
+echo "Generating parts and audio (4 of 5)" > status
+cd Generated
+../Build/Composer --generateparts
+sox -t wav "|timidity out.mid -Ow -o -" --norm out.mp3 reverb -w 40 &
+$ly Flute.ly &
+$ly Oboe.ly &
+$ly Clarinet.ly &
+$ly Bassoon.ly &
+$ly Horn.ly &
+$ly Trumpet.ly &
+$ly Trombone.ly &
+$ly BaritoneSax.ly &
+$ly Vibraphone.ly &
+$ly Crotales.ly &
+$ly Violin.ly &
+$ly Viola.ly &
+$ly Cello.ly &
+$ly DoubleBass.ly &
+$ly Ensemble.ly &
+wait
+sleep 1
+title=`grep title Ensemble.ly | sed 's/^.*[=]["]//g;s/["]//g'`
+composer=`grep composer Ensemble.ly | sed 's/^.*[=]["]//g;s/["]//g'`
+if [ -z "$title" ] ;
+then
+title="Untitled";
+fi
+
+mv out.mp3 "$title.mp3"
+mkdir Parts
+mv *.pdf Parts/
+mv Parts/Ensemble.pdf "$title.pdf"
+mv out.xml "$title.xml"
+mv out.fms "$title.fms"
+mv out.mid "$title.mid"
+mkdir Analysis
+mv *.png Analysis/
+cp ../Source/Piece.h Analysis/Parameters.txt
+sleep 1
+cd ..
+
+#Bundle everything into a zip.
+echo "Finishing (5 of 5)" > status
+rm Generated/*.ly
+rm Generated/*.m
+mkdir Container
+mv Generated "Container/$title"
+cd Container
+zip -r ../out.zip "$title"
+cd ..
+mv "Container/$title" Generated
+mv out.zip Generated/
+rm -rf Container
+sleep 1
+
+#Show end time.
+echo "Finished at:"
+date
+rm status
+rm working
+touch done
