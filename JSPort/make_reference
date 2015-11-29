@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+Dir.chdir(File.expand_path(File.dirname(__FILE__)))
+
+def verbose(command)
+  puts "--> #{command}"
+  system(command) || (fail "Failed: #{command}")
+end
+
+verbose 'c++ -o Reference Reference.cpp'
+verbose './Reference'
+verbose 'rm -f ./Reference'
