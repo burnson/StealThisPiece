@@ -41,7 +41,7 @@ var computationRateInversion = 0.9975;
 
 // Probabilities
 var probabilities;
-function setPlanProbabilities() {
+function setPlanProbabilities () {
   probabilities = {
     "MoveBackward": 200000,
     "MoveForward": 200000,
@@ -126,7 +126,7 @@ function setPlanProbabilities() {
   };
 }
 
-function distributeProbabilities(amount)
+function distributeProbabilities (amount)
 {
   // Apply probability inversion if being used.
   probabilities["MoveBackward"] -=
@@ -239,7 +239,7 @@ var instructionIndexToName = [
   "InstructionCount"
 ];
 
-var instructionNameToIndex = function() {
+var instructionNameToIndex = function () {
   var x = {}, i;
   for (i = 0; i < instructionIndexToName.length; i++) {
     x[instructionIndexToName[i]] = i
@@ -259,13 +259,13 @@ var cannedRandom = [
 ];
 
 var cannedRandomIndex = 0;
-function randomBetweenCount(a, b)
+function randomBetweenCount (a, b)
 {
   var x = cannedRandom[cannedRandomIndex++];
   return x;
 }
 
-function randomNextNumber()
+function randomNextNumber ()
 {
   var n = cannedRandom[cannedRandomIndex++];
   return n;
@@ -275,7 +275,7 @@ function randomNextNumber()
 var durationIndex = 0;
 var durations = [];
 var durationLCM = 48;
-function createDurations() {
+function createDurations () {
   if (globalRhythmSixteenth) durations.push(durationLCM * 1 / 16);
   if (globalRhythmTripletEighth) durations.push(durationLCM * 1 / 12);
   if (globalRhythmEighth) durations.push(durationLCM * 1 / 8);
@@ -287,7 +287,7 @@ function createDurations() {
 
 var instruments = [];
 
-function makeInstrument(index, name, low, high) {
+function makeInstrument (index, name, low, high) {
   return {
     "index": index,
     "name": name,
@@ -299,7 +299,7 @@ function makeInstrument(index, name, low, high) {
   };
 }
 
-function createInstruments() {
+function createInstruments () {
   var i = [];
   i.push(makeInstrument(0,  "Flute",       67, 98 + globalRange)); //G4-D6
   i.push(makeInstrument(1,  "Oboe",        60, 84 + globalRange)); //C4-C6
@@ -320,7 +320,7 @@ function createInstruments() {
 
 var instructions = [], data = [], instructionPointer = 0;
 
-function planLoops() {
+function planLoops () {
   var a = globalLoopInnerStartLow;
   var b = a + globalLoopInnerStartHigh;
   var c = b + globalLoopInnerEndLow;
@@ -343,7 +343,32 @@ function planLoops() {
   }
 }
 
-function createPiece() {
+function getProbableInstruction (normalizedNumber) {
+  var k, bestKey = 'NullOp', lowestValue = 2; //i.e. a number > 1
+  for (k in probabilities) {
+    if (normalizedNumber < probabilities[k] && probabilities[k] < lowestValue) {
+      lowestValue = probabilities[k];
+      bestKey = k;
+    }
+  }
+  return instructionNameToIndex[bestKey];
+}
+
+function planInstructions () {
+  var i, n = instructions.length;
+  var inversionProbability;
+  for(i = 0; i < n; i++)
+  {
+    setPlanProbabilities();
+    inversionProbability = (Math.floor(i / Math.floor(n /
+      globalProbabilityInversionSections)) % 2);
+    distributeProbabilities(inversionProbability);
+    if(instructions[i] === 0)
+      instructions[i] = getProbableInstruction(randomNextNumber());
+  }
+}
+
+function createPiece () {
   // Initialize constants and distributions.
   createDurations();
   createInstruments();
@@ -356,8 +381,9 @@ function createPiece() {
   for (i = 0; i < globalTapeLength; i++) { data[i] = 0; }
   
   planLoops();
+  planInstructions();
 }
 
 // Main
 createPiece();
-console.log(instructions.join(' '));
+console.log(instructions.join("\n"));
