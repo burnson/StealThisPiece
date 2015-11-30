@@ -40,88 +40,116 @@ var globalPitch11 = true;
 var computationRateInversion = 0.9975;
 
 // Probabilities
-var probabilities = {
-  "MoveBackward": 200000,
-  "MoveForward": 200000,
-  "DecrementData": 200000,
-  "IncrementData": 200000,
-  "DecrementDuration": 5000,
-  "IncrementDuration": 5000,
-  "EmitFlute": 400,
-  "EmitOboe": 400,
-  "EmitClarinet": 200,
-  "EmitBassoon": 200,
-  "EmitHorn": 100,
-  "EmitTrumpet": 200,
-  "EmitTrombone": 100,
-  "EmitBaritoneSax": 500,
-  "EmitVibraphone": 500,
-  "EmitCrotales": 100,
-  "EmitViolin": 500,
-  "EmitViola": 500,
-  "EmitCello": 300,
-  "EmitDoubleBass": 100,
-  "ToggleWinds": 1000,
-  "ToggleBrass": 1000,
-  "TogglePercussion": 1000,
-  "ToggleStrings": 1000,
-  "FluteSoft": 10,
-  "FluteLoud": 10,
-  "FluteSofter": 10,
-  "FluteLouder": 10,
-  "OboeSoft": 10,
-  "OboeLoud": 10,
-  "OboeSofter": 10,
-  "OboeLouder": 10,
-  "ClarinetSoft": 10,
-  "ClarinetLoud": 10,
-  "ClarinetSofter": 10,
-  "ClarinetLouder": 10,
-  "BassoonSoft": 10,
-  "BassoonLoud": 10,
-  "BassoonSofter": 10,
-  "BassoonLouder": 10,
-  "HornSoft": 10,
-  "HornLoud": 10,
-  "HornSofter": 10,
-  "HornLouder": 10,
-  "TrumpetSoft": 10,
-  "TrumpetLoud": 10,
-  "TrumpetSofter": 10,
-  "TrumpetLouder": 10,
-  "TromboneSoft": 10,
-  "TromboneLoud": 10,
-  "TromboneSofter": 10,
-  "TromboneLouder": 10,
-  "BaritoneSaxSoft": 10,
-  "BaritoneSaxLoud": 10,
-  "BaritoneSaxSofter": 10,
-  "BaritoneSaxLouder": 10,
-  "VibraphoneSoft": 10,
-  "VibraphoneLoud": 10,
-  "VibraphoneSofter": 10,
-  "VibraphoneLouder": 10,
-  "CrotalesSoft": 10,
-  "CrotalesLoud": 10,
-  "CrotalesSofter": 10,
-  "CrotalesLouder": 10,
-  "ViolinSoft": 10,
-  "ViolinLoud": 10,
-  "ViolinSofter": 10,
-  "ViolinLouder": 10,
-  "ViolaSoft": 10,
-  "ViolaLoud": 10,
-  "ViolaSofter": 10,
-  "ViolaLouder": 10,
-  "CelloSoft": 10,
-  "CelloLoud": 10,
-  "CelloSofter": 10,
-  "CelloLouder": 10,
-  "DoubleBassSoft": 10,
-  "DoubleBassLoud": 10,
-  "DoubleBassSofter": 10,
-  "DoubleBassLouder": 10,
-};
+var probabilities;
+function setPlanProbabilities() {
+  probabilities = {
+    "MoveBackward": 200000,
+    "MoveForward": 200000,
+    "DecrementData": 200000,
+    "IncrementData": 200000,
+    "DecrementDuration": 5000,
+    "IncrementDuration": 5000,
+    "EmitFlute": 400,
+    "EmitOboe": 400,
+    "EmitClarinet": 200,
+    "EmitBassoon": 200,
+    "EmitHorn": 100,
+    "EmitTrumpet": 200,
+    "EmitTrombone": 100,
+    "EmitBaritoneSax": 500,
+    "EmitVibraphone": 500,
+    "EmitCrotales": 100,
+    "EmitViolin": 500,
+    "EmitViola": 500,
+    "EmitCello": 300,
+    "EmitDoubleBass": 100,
+    "ToggleWinds": 1000,
+    "ToggleBrass": 1000,
+    "TogglePercussion": 1000,
+    "ToggleStrings": 1000,
+    "FluteSoft": 10,
+    "FluteLoud": 10,
+    "FluteSofter": 10,
+    "FluteLouder": 10,
+    "OboeSoft": 10,
+    "OboeLoud": 10,
+    "OboeSofter": 10,
+    "OboeLouder": 10,
+    "ClarinetSoft": 10,
+    "ClarinetLoud": 10,
+    "ClarinetSofter": 10,
+    "ClarinetLouder": 10,
+    "BassoonSoft": 10,
+    "BassoonLoud": 10,
+    "BassoonSofter": 10,
+    "BassoonLouder": 10,
+    "HornSoft": 10,
+    "HornLoud": 10,
+    "HornSofter": 10,
+    "HornLouder": 10,
+    "TrumpetSoft": 10,
+    "TrumpetLoud": 10,
+    "TrumpetSofter": 10,
+    "TrumpetLouder": 10,
+    "TromboneSoft": 10,
+    "TromboneLoud": 10,
+    "TromboneSofter": 10,
+    "TromboneLouder": 10,
+    "BaritoneSaxSoft": 10,
+    "BaritoneSaxLoud": 10,
+    "BaritoneSaxSofter": 10,
+    "BaritoneSaxLouder": 10,
+    "VibraphoneSoft": 10,
+    "VibraphoneLoud": 10,
+    "VibraphoneSofter": 10,
+    "VibraphoneLouder": 10,
+    "CrotalesSoft": 10,
+    "CrotalesLoud": 10,
+    "CrotalesSofter": 10,
+    "CrotalesLouder": 10,
+    "ViolinSoft": 10,
+    "ViolinLoud": 10,
+    "ViolinSofter": 10,
+    "ViolinLouder": 10,
+    "ViolaSoft": 10,
+    "ViolaLoud": 10,
+    "ViolaSofter": 10,
+    "ViolaLouder": 10,
+    "CelloSoft": 10,
+    "CelloLoud": 10,
+    "CelloSofter": 10,
+    "CelloLouder": 10,
+    "DoubleBassSoft": 10,
+    "DoubleBassLoud": 10,
+    "DoubleBassSofter": 10,
+    "DoubleBassLouder": 10
+  };
+}
+
+function distributeProbabilities(amount)
+{
+  // Apply probability inversion if being used.
+  probabilities["MoveBackward"] -=
+    computationRateInversion * probabilities["MoveBackward"] * amount;
+  probabilities["MoveForward"] -=
+    computationRateInversion * probabilities["MoveForward"] * amount;
+  probabilities["DecrementData"] -=
+    computationRateInversion * probabilities["DecrementData"] * amount;
+  probabilities["IncrementData"] -=
+    computationRateInversion * probabilities["IncrementData"] * amount;
+    
+  // Turn the probabilities into a distribution.
+  var sum = 0, instruction;
+  for(instruction in probabilities) {
+    sum += probabilities[instruction];
+    probabilities[instruction] = sum;
+  }
+  
+  // Normalize the distribution.
+  for(instruction in probabilities) {
+    probabilities[instruction] /= sum;
+  }
+}
 
 // Instruction set
 var instructionIndexToName = [
@@ -250,12 +278,49 @@ function createDurations() {
   if (globalRhythmQuarter) durations.push(durationLCM * 1 / 4);
 }
 
+// Instruments
+
+var instruments = [];
+
+function makeInstrument(index, name, low, high) {
+  return {
+    "index": index,
+    "name": name,
+    "low": low,
+    "high": high,
+    "notes": [],
+    "offset": 0,
+    "dynamic": 3
+  };
+}
+
+function createInstruments() {
+  var i = [];
+  i.push(makeInstrument(0,  "Flute",       67, 98 + globalRange)); //G4-D6
+  i.push(makeInstrument(1,  "Oboe",        60, 84 + globalRange)); //C4-C6
+  i.push(makeInstrument(2,  "Clarinet",    50, 79 + globalRange)); //D3-G5
+  i.push(makeInstrument(3,  "Bassoon",     36, 67 + globalRange)); //C2-G4
+  i.push(makeInstrument(4,  "Horn",        48, 72 + globalRange)); //C3-C5
+  i.push(makeInstrument(5,  "Trumpet",     55, 79 + globalRange)); //G3-G5
+  i.push(makeInstrument(6,  "Trombone",    43, 67 + globalRange)); //G2-G4
+  i.push(makeInstrument(7,  "BaritoneSax", 43, 60 + globalRange)); //G2-C4
+  i.push(makeInstrument(8,  "Vibraphone",  53, 89              )); //F3-F6
+  i.push(makeInstrument(9,  "Crotales",    60, 84              )); //C2-C4
+  i.push(makeInstrument(10, "Violin",      55, 84 + globalRange)); //G3-C6
+  i.push(makeInstrument(11, "Viola",       48, 79 + globalRange)); //C3-G5
+  i.push(makeInstrument(12, "Cello",       36, 67 + globalRange)); //C2-G5
+  i.push(makeInstrument(13, "DoubleBass",  28, 48 + globalRange)); //E2-C4
+  instruments = i;
+}
+
 function createPiece() {
   //Initialize constants and distributions.
   createDurations();
+  createInstruments();
+  setPlanProbabilities();
+  distributeProbabilities(0.0);
 }
 
 // Main
 createPiece();
-
-console.log(durations);
+console.log(probabilities);
