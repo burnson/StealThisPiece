@@ -16,20 +16,13 @@ enum Instructions
   MoveBackward, MoveForward, DecrementData, IncrementData,
   DecrementDuration, IncrementDuration,
   
-  Woodwinds,
-  EmitFlute = Woodwinds, EmitOboe, EmitClarinet, EmitBassoon,
+  EmitFlute, EmitOboe, EmitClarinet, EmitBassoon,
   
-  Brass,
-  EmitHorn = Brass, EmitTrumpet, EmitTrombone, EmitBaritoneSax,
+  EmitHorn, EmitTrumpet, EmitTrombone, EmitBaritoneSax,
   
-  Percussion,
-  EmitVibraphone = Percussion, EmitCrotales,
+  EmitVibraphone, EmitCrotales,
   
-  Strings,
-  EmitViolin = Strings, EmitViola, EmitCello, EmitDoubleBass,
-  
-  FirstInstrument = EmitFlute,
-  LastInstrument = EmitDoubleBass,
+  EmitViolin, EmitViola, EmitCello, EmitDoubleBass,
   
   ToggleWinds, ToggleBrass, TogglePercussion, ToggleStrings,
   
@@ -50,9 +43,6 @@ enum Instructions
   ViolaSoft, ViolaLoud, ViolaSofter, ViolaLouder,
   CelloSoft, CelloLoud, CelloSofter, CelloLouder,
   DoubleBassSoft, DoubleBassLoud, DoubleBassSofter, DoubleBassLouder,
-  
-  FirstDynamic = FluteSoft,
-  LastDynamic = DoubleBassLouder,
   
   InstructionCount
 };
@@ -364,15 +354,15 @@ struct Instrument
   
   count Group(void)
   {
-    count Base = FirstInstrument;
-    if(ID < Brass - FirstInstrument)
+    count Base = EmitFlute;
+    if(ID < EmitHorn - EmitFlute)
       return 0;
-    else if(ID < Percussion - FirstInstrument)
+    else if(ID < EmitVibraphone - EmitFlute)
       return 1;
     /*Note: <= is used below to compensate for a bug in the original where the
     Violin was considered part of the percussion group for toggling purposes. If
     backwards compatibility is not a concern then it can be changed to <.*/
-    else if(ID <= Strings - FirstInstrument)
+    else if(ID <= EmitViolin - EmitFlute)
       return 2;
     return 3;
   }
@@ -427,9 +417,9 @@ void Emit(ascii i)
     DurationIndex = Max((count)0, DurationIndex - 1);
   else if(i == IncrementDuration)
     DurationIndex = Min((count)Durations.n() - 1, DurationIndex + 1);
-  else if(i >= FirstInstrument && i <= LastInstrument)
+  else if(i >= EmitFlute && i <= EmitDoubleBass)
   {
-    count InstrumentID = i - FirstInstrument;
+    count InstrumentID = i - EmitFlute;
     Instruments[InstrumentID]->Add(GetData());
   }
   else if(i >= ToggleWinds && i <= ToggleStrings)
@@ -438,9 +428,9 @@ void Emit(ascii i)
     if(!Toggles[0] && !Toggles[1] && !Toggles[2] && !Toggles[3])
       Toggles[0] = Toggles[1] = Toggles[2] = Toggles[3] = true;
   }
-  else if(i >= FirstDynamic && i <= LastDynamic)
+  else if(i >= FluteSoft && i <= DoubleBassLouder)
   {
-    count DynamicID = i - FirstDynamic;
+    count DynamicID = i - FluteSoft;
     count DynamicType = DynamicID % 4;
     count DynamicInstrument = (DynamicID - DynamicType) / 4;
     count& DynamicMark = Instruments[DynamicInstrument]->DynamicMark;
@@ -499,7 +489,7 @@ bool PerformInstruction(void)
 
 bool InstrumentUsed(count EmitCode)
 {
-  return (bool)Instruments[EmitCode - FirstInstrument]->Notes.n();
+  return (bool)Instruments[EmitCode - EmitFlute]->Notes.n();
 }
 
 
