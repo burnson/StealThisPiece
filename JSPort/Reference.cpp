@@ -576,7 +576,6 @@ void CreatePiece(void)
     if(i < HighestDataAccess)
       s << ", ";
   }
-  c >> s;
   String DataHash = MD5::Hex(s.Merge());
   
   //Output information.

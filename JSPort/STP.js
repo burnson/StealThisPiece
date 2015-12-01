@@ -318,7 +318,9 @@ function createInstruments () {
   instruments = i;
 }
 
-var instructions = [], data = [], instructionPointer = 0;
+var instructions = [], data = [];
+var instructionPointer = 0;
+var dataPointer = 0;
 
 function planLoops () {
   var a = globalLoopInnerStartLow;
@@ -368,6 +370,76 @@ function planInstructions () {
   }
 }
 
+var cycleCount = 0;
+var lowestDataAccess = 0;
+var highestDataAccess = 0;
+
+function halt() {
+  return instructionPointer >= instructions.length || instructionPointer < 0;
+}
+
+function getInstruction () {
+  return instructionIndexToName[instructions[instructionPointer]];
+}
+
+function updateDataAccess () {
+  if (dataPointer < lowestDataAccess) {
+    lowestDataAccess = dataPointer;
+  }
+  if (dataPointer > highestDataAccess) {
+    highestDataAccess = dataPointer;
+  }
+}
+
+function getCyclicDataPointer () {
+  return (dataPointer + data.length * Math.abs(dataPointer)) % data.length;
+}
+
+function getData () {
+  updateDataAccess();
+  return data[getCyclicDataPointer()];
+}
+
+function addToData (amount) {
+  updateDataAccess();
+  var x = getCyclicDataPointer();
+  data[x] = (data[x] + amount + 256) % 256;
+}
+
+function emit (i) {
+  console.log(i);
+}
+
+function performInstruction () {
+  cycleCount++;
+  if (halt()) return false;
+  var i = getInstruction();
+  if (i === "MoveForward") dataPointer++;
+  else if (i === "MoveBackward") dataPointer--;
+  else if (i === "IncrementData") addToData(1);
+  else if (i === "DecrementData") addToData(-1);
+  else if ((i === "WhileBegin" && !getData()) || (i === "WhileEnd" && getData())) {
+    if (i !== "WhileEnd" || randomBetweenCount(0, globalLoopContinueRate)) {
+      //Perform jump operation to emulate while loops.
+      var braceCount = 1;
+      do {
+        instructionPointer += (i == "WhileBegin" ? 1 : -1);
+        if (halt()) {
+          return false;
+        }
+        if (getInstruction() === (i === "WhileBegin" ? "WhileEnd" : "WhileBegin"))
+          braceCount--;
+        else if (getInstruction() === (i === "WhileEnd" ? "WhileEnd" : "WhileBegin"))
+          braceCount++;
+      } while (braceCount > 0);
+    }
+  } else {
+    emit(i);
+  }
+  instructionPointer++;
+  return true;
+}
+
 function createPiece () {
   // Initialize constants and distributions.
   createDurations();
@@ -382,8 +454,8 @@ function createPiece () {
   
   planLoops();
   planInstructions();
+  while (performInstruction()) {}
 }
 
 // Main
 createPiece();
-console.log(instructions.join("\n"));
