@@ -285,21 +285,6 @@ struct Note
   Ratio m;
   Note() : t(0), d(0), p(0), m(0) {}
   Note(Ratio t, Ratio d, count p, Ratio m) : t(t), d(d), p(p), m(m) {}
-  
-  //Generate articulation to emphasize existing rhythm and dynamics.
-  String Articulation(void)
-  {
-    if(d <= Ratio(1, 8)) //Short rhythm
-    {
-      if(m < Ratio(3, 7))
-        return " [.] "; //Staccato for ppp, pp, p
-      else if(m >= Ratio(4, 7) && m < Ratio(6, 7))
-        return " [>] "; //Accent for f, ff
-    }
-    else if(d > Ratio(1, 2)) //Long rhythm
-      return " [-] "; //Tenuto
-    return "";
-  }
 };
 
 struct Instrument

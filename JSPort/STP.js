@@ -407,7 +407,16 @@ function addToData (amount) {
 }
 
 function emit (i) {
-  console.log(i);
+  var index = instructionNameToIndex[i];
+  if (i === 'DecrementDuration') {
+    durationIndex = Math.max(0, durationIndex - 1);
+  } else if (i === 'IncrementDuration') {
+    durationIndex = Math.min(durations.length - 1, durationIndex + 1);
+  } else if (index >= instructionNameToIndex['EmitFlute'] &&
+             index <= instructionNameToIndex['EmitDoubleBass']) {
+    var instrumentId = index - instructionNameToIndex['EmitFlute'];
+    //Instruments[InstrumentID]->Add(GetData());
+  }
 }
 
 function performInstruction () {
