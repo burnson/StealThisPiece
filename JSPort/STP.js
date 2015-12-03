@@ -25,18 +25,11 @@ var globalRhythmTripletQuarter = true;
 var globalRhythmQuarter = false;
 var globalUseHairpins = true;
 var globalWrapDynamics = true;
-var globalPitch0 = true;
-var globalPitch1 = true;
-var globalPitch2 = true;
-var globalPitch3 = true;
-var globalPitch4 = true;
-var globalPitch5 = true;
-var globalPitch6 = true;
-var globalPitch7 = true;
-var globalPitch8 = true;
-var globalPitch9 = true;
-var globalPitch10 = true;
-var globalPitch11 = true;
+var pitchClass = [
+  true, true, true, true,
+  true, true, true, true,
+  true, true, true, true
+];
 var computationRateInversion = 0.9975;
 
 // Probabilities
@@ -286,10 +279,12 @@ function createDurations () {
 // Instruments
 
 var instruments = [];
+var toggles = [true, true, true, true];
 
-function makeInstrument (index, name, low, high) {
+function makeInstrument (index, group, name, low, high) {
   return {
     "index": index,
+    "group": group,
     "name": name,
     "low": low,
     "high": high,
@@ -301,21 +296,27 @@ function makeInstrument (index, name, low, high) {
 
 function createInstruments () {
   var i = [];
-  i.push(makeInstrument(0,  "Flute",       67, 98 + globalRange)); //G4-D6
-  i.push(makeInstrument(1,  "Oboe",        60, 84 + globalRange)); //C4-C6
-  i.push(makeInstrument(2,  "Clarinet",    50, 79 + globalRange)); //D3-G5
-  i.push(makeInstrument(3,  "Bassoon",     36, 67 + globalRange)); //C2-G4
-  i.push(makeInstrument(4,  "Horn",        48, 72 + globalRange)); //C3-C5
-  i.push(makeInstrument(5,  "Trumpet",     55, 79 + globalRange)); //G3-G5
-  i.push(makeInstrument(6,  "Trombone",    43, 67 + globalRange)); //G2-G4
-  i.push(makeInstrument(7,  "BaritoneSax", 43, 60 + globalRange)); //G2-C4
-  i.push(makeInstrument(8,  "Vibraphone",  53, 89              )); //F3-F6
-  i.push(makeInstrument(9,  "Crotales",    60, 84              )); //C2-C4
-  i.push(makeInstrument(10, "Violin",      55, 84 + globalRange)); //G3-C6
-  i.push(makeInstrument(11, "Viola",       48, 79 + globalRange)); //C3-G5
-  i.push(makeInstrument(12, "Cello",       36, 67 + globalRange)); //C2-G5
-  i.push(makeInstrument(13, "DoubleBass",  28, 48 + globalRange)); //E2-C4
+  i.push(makeInstrument(0,  0, "Flute",       67, 98 + globalRange)); //G4-D6
+  i.push(makeInstrument(1,  0, "Oboe",        60, 84 + globalRange)); //C4-C6
+  i.push(makeInstrument(2,  0, "Clarinet",    50, 79 + globalRange)); //D3-G5
+  i.push(makeInstrument(3,  0, "Bassoon",     36, 67 + globalRange)); //C2-G4
+  i.push(makeInstrument(4,  1, "Horn",        48, 72 + globalRange)); //C3-C5
+  i.push(makeInstrument(5,  1, "Trumpet",     55, 79 + globalRange)); //G3-G5
+  i.push(makeInstrument(6,  1, "Trombone",    43, 67 + globalRange)); //G2-G4
+  i.push(makeInstrument(7,  1, "BaritoneSax", 43, 60 + globalRange)); //G2-C4
+  i.push(makeInstrument(8,  2, "Vibraphone",  53, 89              )); //F3-F6
+  i.push(makeInstrument(9,  2, "Crotales",    60, 84              )); //C2-C4
+  i.push(makeInstrument(10, 3, "Violin",      55, 84 + globalRange)); //G3-C6
+  i.push(makeInstrument(11, 3, "Viola",       48, 79 + globalRange)); //C3-G5
+  i.push(makeInstrument(12, 3, "Cello",       36, 67 + globalRange)); //C2-G5
+  i.push(makeInstrument(13, 3, "DoubleBass",  28, 48 + globalRange)); //E2-C4
   instruments = i;
+  
+  /*Note: Violin is reassigned to group 2 below to express the behavior of a bug
+  in the original where the Violin was considered part of the percussion group
+  for toggling purposes. If backwards compatibility is not a concern then this
+  line can be removed.*/
+  instruments[10].group = 2;
 }
 
 var instructions = [], data = [];
@@ -406,6 +407,54 @@ function addToData (amount) {
   data[x] = (data[x] + amount + 256) % 256;
 }
 
+function lookupPitch(instrument, x) {
+  var i, noteStart = instrument.low;
+  
+  if (instrument.low === instrument.high) {
+    return instrument.low;
+  }
+  
+  // Find the first C and make that 0.
+  if (noteStart % 12 != 0) {
+    noteStart += (12 - (instrument.low % 12));
+  }
+  
+  if (x === 0) {
+    return noteStart;
+  }
+  
+  if (x > 0) {
+    for (i = 0; i < x; i++) {
+      while (!pitchClass[(++noteStart) % 12]) {}
+      
+      //Octave down as far as possible if out of range.
+      if (noteStart > instrument.high) {
+        while (noteStart - 12 >= instrument.low) {
+          noteStart -= 12;
+        }
+      }
+    }
+  } else {
+    for (i = 0; i < -x; i++) {
+      while (!pitchClass[(--noteStart) % 12]) {}
+      
+      //Octave up as far as possible if out of range.
+      if (noteStart < instrument.low) {
+        while (noteStart + 12 <= instrument.high) {
+          noteStart += 12;
+        }
+      }
+    }
+  }
+  return noteStart;
+}
+
+function addNote (instrument, data) {
+  var instrumentIsOn = toggles[instrument.group];
+  var actualPitch = lookupPitch(instrument, data);
+  console.log(actualPitch);
+}
+
 function emit (i) {
   var index = instructionNameToIndex[i];
   if (i === 'DecrementDuration') {
@@ -415,7 +464,8 @@ function emit (i) {
   } else if (index >= instructionNameToIndex['EmitFlute'] &&
              index <= instructionNameToIndex['EmitDoubleBass']) {
     var instrumentId = index - instructionNameToIndex['EmitFlute'];
-    //Instruments[InstrumentID]->Add(GetData());
+    var d = getData();
+    addNote(instruments[instrumentId], getData());
   }
 }
 
