@@ -407,8 +407,10 @@ function addToData (amount) {
   data[x] = (data[x] + amount + 256) % 256;
 }
 
-function lookupPitch(instrument, x) {
+function lookupPitch(instrument, p) {
+  var x;
   var i, noteStart = instrument.low;
+  x = p < 128 ? p : p - 256;
   
   if (instrument.low === instrument.high) {
     return instrument.low;
@@ -490,13 +492,10 @@ function addNote (instrument, data) {
 
 function emit (i) {
   var index = indexOf[i];
-  console.log(index);
   if (i === 'DecrementDuration') {
     durationIndex = Math.max(0, durationIndex - 1);
-    console.log('dd: ' + durationIndex);
   } else if (i === 'IncrementDuration') {
     durationIndex = Math.min(durations.length - 1, durationIndex + 1);
-    console.log('id: ' + durationIndex);
   } else if (index >= indexOf.EmitFlute &&
              index <= indexOf.EmitDoubleBass) {
     var instrumentId = index - indexOf['EmitFlute'];
@@ -509,10 +508,6 @@ function emit (i) {
     if (!toggles[0] && !toggles[1] && !toggles[2] && !toggles[3]) {
       toggles = [true, true, true, true];
     }
-    console.log('t0: ' + (toggles[0] ? 1 : 0));
-    console.log('t1: ' + (toggles[1] ? 1 : 0));
-    console.log('t2: ' + (toggles[2] ? 1 : 0));
-    console.log('t3: ' + (toggles[3] ? 1 : 0));
   } else if (index >= indexOf.FluteSoft && index <= indexOf.DoubleBassLouder) {
     var dynamicId = index - indexOf.FluteSoft;
     var dynamicType = dynamicId % 4;
@@ -536,7 +531,6 @@ function emit (i) {
       }
     }
     instruments[dynamicInstrument].dynamicMark = dynamicMark;
-    console.log('dm: ' + dynamicMark);
   }
 }
 
@@ -597,7 +591,7 @@ function pieceAsString () {
       var s = instrument.name;
       s += ',' + note.time;
       s += ',' + note.duration;
-//      s += ',' + note.pitch;
+      s += ',' + note.pitch;
       s += ',' + note.dynamicMark;
       s += "\n";
       pieceString += s;
