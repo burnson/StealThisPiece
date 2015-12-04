@@ -398,10 +398,15 @@ bool Halt(void)
 
 void Emit(ascii i)
 {
-  if(i == DecrementDuration)
+  c >> (int)i;
+  if(i == DecrementDuration) {
     DurationIndex = Max((count)0, DurationIndex - 1);
-  else if(i == IncrementDuration)
+    c >> "dd: " << DurationIndex;
+  }
+  else if(i == IncrementDuration) {
     DurationIndex = Min((count)Durations.n() - 1, DurationIndex + 1);
+    c >> "id: " << DurationIndex;
+  }
   else if(i >= EmitFlute && i <= EmitDoubleBass)
   {
     count InstrumentID = i - EmitFlute;
@@ -412,6 +417,10 @@ void Emit(ascii i)
     Toggles[i - ToggleWinds] = !Toggles[i - ToggleWinds];
     if(!Toggles[0] && !Toggles[1] && !Toggles[2] && !Toggles[3])
       Toggles[0] = Toggles[1] = Toggles[2] = Toggles[3] = true;
+    c >> "t0: " << (Toggles[0] ? 1 : 0);
+    c >> "t1: " << (Toggles[1] ? 1 : 0);
+    c >> "t2: " << (Toggles[2] ? 1 : 0);
+    c >> "t3: " << (Toggles[3] ? 1 : 0);
   }
   else if(i >= FluteSoft && i <= DoubleBassLouder)
   {
@@ -437,6 +446,7 @@ void Emit(ascii i)
       else
         DynamicMark = Min(DynamicMark + 1, Dynamics - 1);
     }
+    c >> "dm: " << DynamicMark;
   }
 }
 
@@ -514,7 +524,7 @@ String PieceAsString(void)
       String s = Instruments[i]->Name;
       s << "," << (Instruments[i]->Notes[j].t * 48).Numerator();
       s << "," << (Instruments[i]->Notes[j].d * 48).Numerator();
-      s << "," << Instruments[i]->Notes[j].p;
+//      s << "," << Instruments[i]->Notes[j].p;
       s << "," << (Instruments[i]->Notes[j].m * 7).Numerator();
       s << "\n";
       PieceString << s;
