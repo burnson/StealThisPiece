@@ -3,7 +3,6 @@
 Dir.chdir(File.expand_path(File.dirname(__FILE__)))
 
 def verbose(command)
-  puts "--> #{command}"
   system(command) || (fail "Failed: #{command}")
 end
 

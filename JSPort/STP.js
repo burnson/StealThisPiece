@@ -460,7 +460,6 @@ function makeNote (offset, duration, pitch, dynamicMark) {
     "pitch": pitch,
     "dynamicMark": dynamicMark
   };
-  console.log(n);
   return n;
 }
 
@@ -579,5 +578,25 @@ function createPiece () {
   while (performInstruction()) {}
 }
 
+function pieceAsString () {
+  var i, j;
+  var pieceString = ''
+  for (i = 0; i < instruments.length; i++) {
+    var instrument = instruments[i];
+    for (j = 0; j < instrument.notes.length; j++) {
+      var note = instrument.notes[j];
+      var s = instrument.name;
+      s += ',' + note.time;
+      s += ',' + note.duration;
+      s += ',' + note.pitch;
+      s += ',' + note.dynamicMark;
+      s += "\n";
+      pieceString += s;
+    }
+  }
+  return pieceString.trim();
+}
+
 // Main
 createPiece();
+console.log(pieceAsString());

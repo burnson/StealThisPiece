@@ -504,6 +504,25 @@ count GetProbableInstruction(number NormalizedNumber)
   return 0;
 }
 
+String PieceAsString(void)
+{
+  String PieceString;
+  for(count i = 0; i < Instruments.n(); i++)
+  {
+    for(count j = 0; j < Instruments[i]->Notes.n(); j++)
+    {
+      String s = Instruments[i]->Name;
+      s << "," << (Instruments[i]->Notes[j].t * 48).Numerator();
+      s << "," << (Instruments[i]->Notes[j].d * 48).Numerator();
+      s << "," << Instruments[i]->Notes[j].p;
+      s << "," << (Instruments[i]->Notes[j].m * 7).Numerator();
+      s << "\n";
+      PieceString << s;
+    }
+  }
+  return PieceString;
+}
+
 void CreatePiece(void)
 {
   //Initialize constants and distributions.
@@ -552,6 +571,10 @@ void CreatePiece(void)
   
   //Run the program.
   while(PerformInstruction()) {}
+  
+  c >> PieceAsString();
+  
+  return;
   
   //Create hash.
   String s;
