@@ -145,7 +145,7 @@ function distributeProbabilities (amount)
 }
 
 // Instruction set
-var instructionIndexToName = [
+var nameOf = [
   "NullOp",
   "WhileBegin",
   "WhileEnd",
@@ -232,10 +232,10 @@ var instructionIndexToName = [
   "InstructionCount"
 ];
 
-var instructionNameToIndex = function () {
+var indexOf = function () {
   var x = {}, i;
-  for (i = 0; i < instructionIndexToName.length; i++) {
-    x[instructionIndexToName[i]] = i
+  for (i = 0; i < nameOf.length; i++) {
+    x[nameOf[i]] = i
   }
   return x;
 }();
@@ -290,7 +290,7 @@ function makeInstrument (index, group, name, low, high) {
     "high": high,
     "notes": [],
     "offset": 0,
-    "dynamic": 3
+    "dynamicMark": 3
   };
 }
 
@@ -332,8 +332,8 @@ function planLoops () {
   var f = e + globalLoopOuterEndHigh;
   var g = f + globalLoopStep;
   var i;
-  var whileBegin = instructionNameToIndex["WhileBegin"];
-  var whileEnd = instructionNameToIndex["WhileEnd"];
+  var whileBegin = indexOf["WhileBegin"];
+  var whileEnd = indexOf["WhileEnd"];
   for(i = 0; i < instructions.length - g; i++)
   {
     if(randomBetweenCount(0, globalLoopSkipCreateRate))
@@ -354,7 +354,7 @@ function getProbableInstruction (normalizedNumber) {
       bestKey = k;
     }
   }
-  return instructionNameToIndex[bestKey];
+  return indexOf[bestKey];
 }
 
 function planInstructions () {
@@ -380,7 +380,7 @@ function halt() {
 }
 
 function getInstruction () {
-  return instructionIndexToName[instructions[instructionPointer]];
+  return nameOf[instructions[instructionPointer]];
 }
 
 function updateDataAccess () {
@@ -449,23 +449,86 @@ function lookupPitch(instrument, x) {
   return noteStart;
 }
 
+var globalTime = 0;
+var dynamics = 7;
+var dynamic = [0, 1, 2, 3, 4, 5, 6];
+
+function makeNote (offset, duration, pitch, dynamicMark) {
+  var n = {
+    "time": offset,
+    "duration": duration,
+    "pitch": pitch,
+    "dynamicMark": dynamicMark
+  };
+  console.log(n);
+  return n;
+}
+
 function addNote (instrument, data) {
   var instrumentIsOn = toggles[instrument.group];
   var actualPitch = lookupPitch(instrument, data);
-  console.log(actualPitch);
+  if (instrument.offset === globalTime) {
+    var duration = durations[durationIndex];
+    if (instrumentIsOn) {
+      instrument.notes.push(makeNote(instrument.offset, duration,
+        actualPitch, dynamic[instrument.dynamicMark]));
+    }
+    instrument.offset += duration;
+    globalTime = instrument.offset;
+  } else if (instrument.offset < globalTime) {
+    var longestNote = globalLongestNote * durationLCM / 4;
+    if (globalTime - instrument.offset > longestNote) {
+      instrument.offset = globalTime - longestNote;
+    }
+    var duration = globalTime - instrument.offset;
+    if (instrumentIsOn) {
+      instrument.notes.push(makeNote(instrument.offset, duration,
+        actualPitch, dynamic[instrument.dynamicMark]));
+    }
+    instrument.offset += duration;
+  }
 }
 
 function emit (i) {
-  var index = instructionNameToIndex[i];
+  var index = indexOf[i];
   if (i === 'DecrementDuration') {
     durationIndex = Math.max(0, durationIndex - 1);
   } else if (i === 'IncrementDuration') {
     durationIndex = Math.min(durations.length - 1, durationIndex + 1);
-  } else if (index >= instructionNameToIndex['EmitFlute'] &&
-             index <= instructionNameToIndex['EmitDoubleBass']) {
-    var instrumentId = index - instructionNameToIndex['EmitFlute'];
+  } else if (index >= indexOf.EmitFlute &&
+             index <= indexOf.EmitDoubleBass) {
+    var instrumentId = index - indexOf['EmitFlute'];
     var d = getData();
     addNote(instruments[instrumentId], getData());
+  } else if (index >= indexOf.ToggleWinds &&
+             index <= indexOf.ToggleStrings) {
+    toggles[i - indexOf.ToggleWinds] = !toggles[i - indexOf.ToggleWinds];
+    if (!toggles[0] && !toggles[1] && !toggles[2] && !toggles[3]) {
+      toggles = [true, true, true, true];
+    }
+  } else if (index >= indexOf.FluteSoft && index <= indexOf.DoubleBassLouder) {
+    var dynamicId = index - indexOf.FluteSoft;
+    var dynamicType = dynamicId % 4;
+    var dynamicInstrument = (dynamicId - dynamicType) / 4;
+    var dynamicMark = instruments[dynamicInstrument].dynamicMark;
+    if (dynamicType === 0) {
+      dynamicMark = 2;
+    } else if (dynamicType === 1) {
+      dynamicMark = 4;
+    } else if (dynamicType === 2) {
+      if (globalWrapDynamics) {
+        dynamicMark = (dynamics + dynamicMark - 1) % dynamics;
+      } else {
+        dynamicMark = Math.max(dynamicMark - 1, 0);
+      }
+    } else {
+      if (globalWrapDynamics) {
+        dynamicMark = (dynamics + dynamicMark + 1) % dynamics;
+      } else {
+        dynamicMark = Math.min(dynamicMark + 1, dynamics - 1);
+      }
+    }
+    instruments[dynamicInstrument].dynamicMark = dynamicMark;
   }
 }
 
