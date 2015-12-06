@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+Dir.chdir(File.expand_path(File.dirname(__FILE__)))
+Dir.chdir('midijs')
+system('killall python')
+system('python -m SimpleHTTPServer &')
+system('sleep 1')
+system('open http://localhost:8000/examples')

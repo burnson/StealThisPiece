@@ -600,6 +600,33 @@ function pieceAsString () {
   return pieceString.trim();
 }
 
+function noteTimeToSeconds (noteTime) {
+  return noteTime * 4 * 60 / globalTempo / durationLCM;
+}
+
+function dynamicMarkToVelocity (dynamicMark) {
+  return Math.round(dynamicMark / 7 * 87) + 20;
+}
+
+function pieceAsMIDI () {
+  var midiData = [], instrument, note;
+  var i, j;
+  for (i = 0; i < instruments.length; i++) {
+    instrument = instruments[i];
+    for (j = 0; j < instrument.notes.length; j++) {
+      note = instrument.notes[j];
+      midiData.push({
+        "time": noteTimeToSeconds(note.time),
+        "duration": noteTimeToSeconds(note.duration),
+        "channel": instrument.index,
+        "pitch": note.pitch,
+        "velocity": dynamicMarkToVelocity(note.dynamicMark)
+      });
+    }
+  }
+  return midiData;
+}
+
 // Main
 createPiece();
-console.log(pieceAsString());
+console.log(JSON.stringify(pieceAsMIDI(), null, 2));
