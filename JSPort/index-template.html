@@ -10,11 +10,27 @@
 /*include:index-keyboard.js*/
 /*include:index-example-data.js*/
 /*include:index-instruments.js*/
+/*include:index-base64.js*/
 
 var context = new (window.AudioContext || window.webkitAudioContext)();
 var midiQueue;
 var playerStartTime;
 var timeInAdvanceToSchedule = 0.5;
+var predestination = context.destination;
+var reverb;
+
+function configureReverb () {
+  var reverbBuffer = decodeBase64ToArrayBuffer(reverb_impulse_response_m4a);
+  var reverbGain = context.createGain();
+  reverbGain.value = 0.2;
+  reverbGain.connect(context.destination);
+  context.decodeAudioData(reverbBuffer, function(audioData) {
+    reverb = context.createConvolver();
+    reverb.buffer = audioData;
+    reverb.connect(reverbGain);
+    predestination = reverb;
+  });
+}
 
 function dBToGain(dB) {
   if (dB <= -100) {
@@ -48,6 +64,7 @@ function getPieceAsMIDI() {
 
 function initialize () {
   makeKeyboard();
+  configureReverb();
   schedulePiece();
 }
 
@@ -75,7 +92,7 @@ function processNextFrame () {
   }
   var playerCurrentTime = getCurrentTime() - playerStartTime;
   var playerScheduleTime = playerCurrentTime + timeInAdvanceToSchedule;
-  while (midiQueue[0].time < playerScheduleTime) {
+  while (midiQueue[0] !== undefined && midiQueue[0].time < playerScheduleTime) {
     var m = midiQueue.shift();
     scheduleInstrumentalNote(m.channel, m.pitch, m.time + playerStartTime,
       m.duration, m.velocity);
@@ -126,7 +143,7 @@ function scheduleOscillator(type, note, startTime, duration, gain, shape) {
     var t = startTime + shape[i].time * duration;
     gainShaper.gain.linearRampToValueAtTime(g, t);
   }
-  gainShaper.connect(context.destination);
+  gainShaper.connect(predestination);
   
   var oscillator = context.createOscillator();
   oscillator.type = type;

@@ -2,11 +2,13 @@
 
 Dir.chdir(File.expand_path(File.dirname(__FILE__)))
 index = File.read('index-template.html')
-index.gsub!('/*include:index-keyboard.js*/',
-  File.read('index-keyboard.js'))
-index.gsub!('/*include:index-example-data.js*/',
-  File.read('index-example-data.js'))
-index.gsub!('/*include:index-instruments.js*/',
-  File.read('index-instruments.js'))
+index.gsub!('/*include:index-keyboard.js*/') {
+  File.read('index-keyboard.js')}
+index.gsub!('/*include:index-example-data.js*/') {
+  File.read('index-example-data.js')}
+index.gsub!('/*include:index-instruments.js*/') {
+  File.read('index-instruments.js')}
+index.gsub!('/*include:index-base64.js*/') {
+  File.read('index-base64.js')}
 File.write('index.html', index)
 system('open index.html')
