@@ -26,13 +26,18 @@ var midiQueue;
 var playerStartTime;
 var timeInAdvanceToSchedule = 0.5;
 var predestination = context.destination;
-var reverb;
+var reverb, reverbGain;
+var masterGain;
 
 function configureReverb () {
+  masterGain = context.createGain();
+  masterGain.gain.value = 1.0;
+  masterGain.connect(context.destination);
+
   var reverbBuffer = decodeBase64ToArrayBuffer(reverb_impulse_response_m4a);
-  var reverbGain = context.createGain();
-  reverbGain.value = 0.2;
-  reverbGain.connect(context.destination);
+  reverbGain = context.createGain();
+  reverbGain.gain.value = 0.2;
+  reverbGain.connect(masterGain);
   context.decodeAudioData(reverbBuffer, function(audioData) {
     reverb = context.createConvolver();
     reverb.buffer = audioData;
@@ -153,6 +158,10 @@ function schedulePiece () {
 }
 
 function scheduleOscillator(type, note, startTime, duration, gain, shape) {
+  if (startTime < getCurrentTime()) {
+    console.log('Warning: dropped note that started in past');
+    return;
+  }
   var gainShaper = context.createGain();
   gainShaper.gain.value = 0;
   gainShaper.gain.setValueAtTime(0, startTime);
@@ -171,7 +180,17 @@ function scheduleOscillator(type, note, startTime, duration, gain, shape) {
   oscillator.connect(gainShaper);
 }
 
+function shutdownGracefully() {
+  console.log('Shutting down audio...');
+  var start = getCurrentTime(), length = 0.5, progress = 0;
+  while (progress <= 1) {
+    masterGain.gain.value = 1 - progress;
+    progress = (getCurrentTime() - start) / length;
+  }
+}
+
 window.onload = initialize;
+window.onbeforeunload = shutdownGracefully;
         </script>
     </body>
 </html>
