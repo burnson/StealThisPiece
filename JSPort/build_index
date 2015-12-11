@@ -10,5 +10,7 @@ index.gsub!('/*include:index-instruments.js*/') {
   File.read('index-instruments.js')}
 index.gsub!('/*include:index-base64.js*/') {
   File.read('index-base64.js')}
+index.gsub!('/*include:index-stp.js*/') {
+  File.read('index-stp.js')}
 File.write('index.html', index)
 system('open index.html')

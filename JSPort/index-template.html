@@ -16,9 +16,10 @@
     <div id="keyboard"></div>
 <script type="text/javascript">
 /*include:index-keyboard.js*/
-/*include:index-example-data.js*/
 /*include:index-instruments.js*/
 /*include:index-base64.js*/
+/*include:index-stp.js*/
+/*include:index-example-data.js*/
 
 var context = new (window.AudioContext || window.webkitAudioContext)();
 var midiQueue;
@@ -58,6 +59,15 @@ function getCurrentTime() {
 }
 
 function getPieceAsMIDI() {
+  createPiece();
+  exampleData = pieceAsMIDI();
+  var csv = pieceAsCSV();
+  var csvMD5 = md5(csv);
+  if (csvMD5 !== '0ca494dc0a5994afc36e3529d7059f6a') {
+    alert('Warning: piece has changed!');
+  }
+  console.log('Hash of CSV: ' + csvMD5);
+
   var sortKey = "time";
   exampleData.sort(function(a, b) {
     if (a[sortKey] < b[sortKey]) {
