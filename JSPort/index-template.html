@@ -13,13 +13,10 @@
   </head>
   <body>
     <div>Steal This Piece!</div>
-    <div id="keyboard"></div>
 <script type="text/javascript">
-/*include:index-keyboard.js*/
 /*include:index-instruments.js*/
 /*include:index-base64.js*/
 /*include:index-stp.js*/
-/*include:index-example-data.js*/
 
 var context = new (window.AudioContext || window.webkitAudioContext)();
 var midiQueue;
@@ -86,23 +83,8 @@ function getPieceAsMIDI() {
 }
 
 function initialize () {
-  makeKeyboard();
   configureReverb();
   schedulePiece();
-}
-
-function makeKeyboard() {
-  (new QwertyHancock({
-       id: 'keyboard',
-       width: 600,
-       height: 150,
-       octaves: 8,
-       startNote: 'A1'
-  })).keyDown = function (note, frequency) {
-    var t = getCurrentTime();
-    var midiNoteNumber = frequencyToMIDINoteNumber(frequency);
-    scheduleInstrumentalNote(0, midiNoteNumber + i, t, 2, 60);
-  };
 }
 
 function midiNoteNumberToFrequency (midiNoteNumber) {
