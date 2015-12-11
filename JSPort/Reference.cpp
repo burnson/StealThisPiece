@@ -506,19 +506,21 @@ count GetProbableInstruction(number NormalizedNumber)
   return 0;
 }
 
-String PieceAsString(void)
+String PieceAsCSV(void)
 {
-  String PieceString;
+  String PieceString = "Instrument,Channel,Start,Duration,Key,Dynamic\n";
   for(count i = 0; i < Instruments.n(); i++)
   {
     for(count j = 0; j < Instruments[i]->Notes.n(); j++)
     {
       String s = Instruments[i]->Name;
+      s << "," << Instruments[i]->ID;
       s << "," << (Instruments[i]->Notes[j].t * 48).Numerator();
       s << "," << (Instruments[i]->Notes[j].d * 48).Numerator();
       s << "," << Instruments[i]->Notes[j].p;
       s << "," << (Instruments[i]->Notes[j].m * 7).Numerator();
-      s << "\n";
+      if(!(i == Instruments.n() - 1 && j == Instruments[i]->Notes.n() - 1))
+        s << "\n";
       PieceString << s;
     }
   }
@@ -574,8 +576,11 @@ void CreatePiece(void)
   //Run the program.
   while(PerformInstruction()) {}
   
-  c >> PieceAsString();
-  
+  String CSVOfPiece = PieceAsCSV();
+  c >> "CSV of piece:";
+  c >> CSVOfPiece;
+  c >> "Hash of CSV: " << MD5::Hex(CSVOfPiece.Merge());
+  c++;
   return;
   
   //Create hash.
