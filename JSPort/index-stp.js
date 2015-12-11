@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // MD5
 function md5cycle(x, k) {
   var a = x[0], b = x[1], c = x[2], d = x[3];
@@ -786,14 +785,23 @@ function pieceAsMIDI () {
   return midiData;
 }
 
-// Main
-createPiece();
-//console.log(JSON.stringify(pieceAsMIDI(), null, 2));
-var finalPiece = pieceAsCSV();
-console.log('CSV of piece:')
-console.log(finalPiece);
-console.log('Hash of CSV: ' + md5(finalPiece));
+function isRunningUnderNodeJS() {
+  return Object.prototype.toString.call(global.process) === '[object process]';
+}
 
-if(md5(finalPiece) !== '0ca494dc0a5994afc36e3529d7059f6a') {
-  console.log('WARNING: piece does not match reference');
+function test () {
+  createPiece();
+  //console.log(JSON.stringify(pieceAsMIDI(), null, 2));
+  var finalPiece = pieceAsCSV();
+  console.log('CSV of piece:')
+  console.log(finalPiece);
+  console.log('Hash of CSV: ' + md5(finalPiece));
+
+  if(md5(finalPiece) !== '0ca494dc0a5994afc36e3529d7059f6a') {
+    console.log('WARNING: piece does not match reference');
+  }
+}
+
+if (isRunningUnderNodeJS()) {
+  test();
 }
