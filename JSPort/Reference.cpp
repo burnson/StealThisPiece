@@ -8,6 +8,127 @@ double CannedRandom[] = {
 #include "prim.h"
 using namespace prim;
 
+class PrunedRandom
+{
+  ///Stores the state of the random number generator.
+  uint32 History[5];
+
+public:
+  //Returns the next uniform 32-bit random number.
+  uint32 Next(void)
+  {
+    uint64 Sum = (uint64)2111111111UL * (uint64)History[3] + //
+                 (uint64)1492 * (uint64)(History[2]) +       //
+                 (uint64)1776 * (uint64)(History[1]) +       //
+                 (uint64)5115 * (uint64)(History[0]) +       //
+                 (uint64)History[4];                         //
+
+    History[3] = History[2];
+    History[2] = History[1];
+    History[1] = History[0];
+    History[4] = (uint32)(Sum >> (uint64)32);
+    History[0] = (uint32)Sum;
+
+    return History[0];
+  }
+
+  /**Returns a uniformly random 64-bit float over [1.0, 2.0). It is
+  calculated by fixing the floating-point exponent and dumping random bits
+  into the mantissa.*/
+  float64 NextRawFloat64(void)
+  {
+    float64 Float = 0;
+    void* FloatVoid = (void*)&Float;
+    uint64* BinaryFloat = reinterpret_cast<uint64*>(FloatVoid);
+    *BinaryFloat = ((uint64)1023 << (uint64)52);
+    uint64 RandomMantissa = ((uint64)Next() << (uint64)32) + (uint64)Next();
+    RandomMantissa = RandomMantissa >> (uint64)12;
+    *BinaryFloat += RandomMantissa;
+    return Float;
+  }
+
+  /**Returns a uniformly random number over [0.0, 1.0) = NextRawFloat64() -
+  1.0. In theory, the floating-point subtraction used in this method will not
+  cause any loss of precision and so it should not introduce correlation.*/
+  number NextNumber(void)
+  {
+    return (number)(NextRawFloat64() - (float64)1.0);
+  }
+
+  /**Returns a random integer in a particular range. The order of the
+  arguments does not make a difference. Note that the upper integer is
+  excluded. In other words the interval is [Low, High).*/
+  integer NextIntegerInRange(integer RangeBound1, integer RangeBound2 = 0)
+  {
+    //If bounds are equal, return the bound.
+    if(RangeBound1 == RangeBound2)
+      return RangeBound1;
+
+    //Determine floating point range.
+    float64 Low, High;
+    integer LowInteger, HighInteger;
+    if(RangeBound1 < RangeBound2)
+    {
+      Low = (float64)RangeBound1;
+      LowInteger = RangeBound1;
+      High = (float64)RangeBound2;
+      HighInteger = RangeBound2;
+    }
+    else
+    {
+      Low = (float64)RangeBound2;
+      LowInteger = RangeBound2;
+      High = (float64)RangeBound1;
+      HighInteger = RangeBound1;
+    }
+
+    //Generate a random number in the interval [1.0, 2.0).
+    float64 Float = NextRawFloat64();
+
+    //Set the range.
+    Float = Float * High - Float * Low - High + (float64)2.0 * Low;
+
+    //Convert to integer.
+    integer Integer = (integer)Float;
+
+    //Clamp the range in case of any floating-point arithmetic errors.
+    if(Integer < LowInteger)
+      Integer = LowInteger;
+    else if(Integer >= HighInteger)
+      Integer = HighInteger - 1;
+
+    return Integer;
+  }
+
+  ///Pick a random sequence using a 32-bit seed.
+  void PickSequence(uint32 Seed)
+  {
+    //Use recommended MCA initialization arithmetic to generate initial state.
+    for(count i = 0; i < 5; i++)
+    {
+      Seed *= 29943829;
+      Seed -= 1;
+      History[i] = Seed;
+    }
+
+    //Break in the sequence by discarding the first 100 values.
+    for(count i = 0; i < 100; i++)
+      Next();
+  }
+  
+  ///Initialize the random number generator with a 32-bit seed.
+  PrunedRandom(uint32 Seed)
+  {
+    PickSequence(Seed);
+  }
+  
+  ///Returns a uniformly random integer [Min, Max).
+  int32 Between(int32 Min, int32 Max)
+  {
+    return (int32)NextIntegerInRange((integer)Min, (integer)Max);
+  }
+};
+
 enum Instructions
 {
   NullOp,
@@ -87,20 +208,20 @@ const count GlobalPitch11 = 1;
 
 const number ComputationRateInversion = 0.9975;
 
-Random r(GlobalSeed);
+PrunedRandom r(GlobalSeed);
 count CannedRandomIndex = 0;
 
 count RandomBetweenCount(count a, count b)
 {
-  count x;// = r.Between(a, b);
-  x = (count)CannedRandom[CannedRandomIndex++];
+  count x = r.Between(a, b);
+  //x = (count)CannedRandom[CannedRandomIndex++];
   return x;
 }
 
 number RandomNextNumber()
 {
-  number n;// = r.NextNumber();
-  n = (number)CannedRandom[CannedRandomIndex++];
+  number n = r.NextNumber();
+  //n = (number)CannedRandom[CannedRandomIndex++];
   return n;
 }
 
@@ -607,6 +728,11 @@ void CreatePiece(void)
 
 int main(int ArgumentCount, const char** Arguments)
 {
-  CreatePiece();
+  PrunedRandom pr(123);
+  for (int i = 0; i < 1000000; i++) {
+    c >> (integer)pr.Next();
+  }
+  c++;
+  //CreatePiece();
   return 0;
 }
