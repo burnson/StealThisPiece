@@ -728,11 +728,6 @@ void CreatePiece(void)
 
 int main(int ArgumentCount, const char** Arguments)
 {
-  PrunedRandom pr(123);
-  for (int i = 0; i < 1000000; i++) {
-    c >> (integer)pr.Next();
-  }
-  c++;
-  //CreatePiece();
+  CreatePiece();
   return 0;
 }
