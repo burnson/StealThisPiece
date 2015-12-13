@@ -1,5 +1,5 @@
 function setPiece () {
-  setBaroquePiece();
+  setThoughtfulPiece();
 }
 
 function setConcertStealThisPiece () {
@@ -251,7 +251,7 @@ function setBaroquePiece () {
   piece.probabilityInversionSections = 12;
   piece.computationRateInversion = 0.9975;
   piece.range = 12;
-  piece.tempo = 500;
+  piece.tempo = 216;
   piece.rhythmSixteenth = true;
   piece.rhythmTripletEighth = false;
   piece.rhythmEighth = true;
@@ -348,6 +348,120 @@ function setBaroquePiece () {
   probabilities.DoubleBassLouder = 10;
 }
 
+function setThoughtfulPiece () {
+  piece = {};
+  piece.seed = 1;
+  piece.loopContinueRate = 20;
+  piece.codeLength = 3000;
+  piece.tapeLength = 10;
+  piece.loopStep = 200;
+  piece.loopSkipCreateRate = 4;
+  piece.loopInnerStartLow = 180;
+  piece.loopInnerStartHigh = 100;
+  piece.loopInnerEndLow = 100;
+  piece.loopInnerEndHigh = 100;
+  piece.loopOuterEndLow = 50;
+  piece.loopOuterEndHigh = 50;
+  piece.longestNote = 4;
+  piece.probabilityInversionSections = 12;
+  piece.computationRateInversion = 0.9975;
+  piece.range = 12;
+  piece.tempo = 100;
+  piece.rhythmSixteenth = true;
+  piece.rhythmTripletEighth = false;
+  piece.rhythmEighth = true;
+  piece.rhythmTripletQuarter = false;
+  piece.rhythmQuarter = true;
+  piece.useHairpins = true;
+  piece.wrapDynamics = true;
+  piece.pitchClass = [
+    true, false, true, false,
+    true, true, false, true,
+    false, true, false, true
+  ];
+  
+  probabilities = {};
+  probabilities.MoveBackward = 200000;
+  probabilities.MoveForward = 200000;
+  probabilities.DecrementData = 400000;
+  probabilities.IncrementData = 100000;
+  probabilities.DecrementDuration = 5700;
+  probabilities.IncrementDuration = 5000;
+  probabilities.EmitFlute = 0;
+  probabilities.EmitOboe = 0;
+  probabilities.EmitClarinet = 0;
+  probabilities.EmitBassoon = 0;
+  probabilities.EmitHorn = 0;
+  probabilities.EmitTrumpet = 0;
+  probabilities.EmitTrombone = 0;
+  probabilities.EmitBaritoneSax = 0;
+  probabilities.EmitVibraphone = 200;
+  probabilities.EmitCrotales = 0;
+  probabilities.EmitViolin = 0;
+  probabilities.EmitViola = 0;
+  probabilities.EmitCello = 200;
+  probabilities.EmitDoubleBass = 0;
+  probabilities.ToggleWinds = 1000;
+  probabilities.ToggleBrass = 1000;
+  probabilities.TogglePercussion = 1000;
+  probabilities.ToggleStrings = 1000;
+  probabilities.FluteSoft = 10;
+  probabilities.FluteLoud = 10;
+  probabilities.FluteSofter = 10;
+  probabilities.FluteLouder = 10;
+  probabilities.OboeSoft = 10;
+  probabilities.OboeLoud = 10;
+  probabilities.OboeSofter = 10;
+  probabilities.OboeLouder = 10;
+  probabilities.ClarinetSoft = 10;
+  probabilities.ClarinetLoud = 10;
+  probabilities.ClarinetSofter = 10;
+  probabilities.ClarinetLouder = 10;
+  probabilities.BassoonSoft = 10;
+  probabilities.BassoonLoud = 10;
+  probabilities.BassoonSofter = 10;
+  probabilities.BassoonLouder = 10;
+  probabilities.HornSoft = 10;
+  probabilities.HornLoud = 10;
+  probabilities.HornSofter = 10;
+  probabilities.HornLouder = 10;
+  probabilities.TrumpetSoft = 10;
+  probabilities.TrumpetLoud = 10;
+  probabilities.TrumpetSofter = 10;
+  probabilities.TrumpetLouder = 10;
+  probabilities.TromboneSoft = 10;
+  probabilities.TromboneLoud = 10;
+  probabilities.TromboneSofter = 10;
+  probabilities.TromboneLouder = 10;
+  probabilities.BaritoneSaxSoft = 10;
+  probabilities.BaritoneSaxLoud = 10;
+  probabilities.BaritoneSaxSofter = 10;
+  probabilities.BaritoneSaxLouder = 10;
+  probabilities.VibraphoneSoft = 10;
+  probabilities.VibraphoneLoud = 10;
+  probabilities.VibraphoneSofter = 10;
+  probabilities.VibraphoneLouder = 10;
+  probabilities.CrotalesSoft = 10;
+  probabilities.CrotalesLoud = 10;
+  probabilities.CrotalesSofter = 10;
+  probabilities.CrotalesLouder = 10;
+  probabilities.ViolinSoft = 10;
+  probabilities.ViolinLoud = 10;
+  probabilities.ViolinSofter = 10;
+  probabilities.ViolinLouder = 10;
+  probabilities.ViolaSoft = 10;
+  probabilities.ViolaLoud = 10;
+  probabilities.ViolaSofter = 10;
+  probabilities.ViolaLouder = 10;
+  probabilities.CelloSoft = 10;
+  probabilities.CelloLoud = 10;
+  probabilities.CelloSofter = 10;
+  probabilities.CelloLouder = 10;
+  probabilities.DoubleBassSoft = 10;
+  probabilities.DoubleBassLoud = 10;
+  probabilities.DoubleBassSofter = 10;
+  probabilities.DoubleBassLouder = 10;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

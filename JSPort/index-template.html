@@ -33,7 +33,7 @@ function configureReverb () {
 
   var reverbBuffer = decodeBase64ToArrayBuffer(reverb_impulse_response_m4a);
   reverbGain = context.createGain();
-  reverbGain.gain.value = 0.2;
+  reverbGain.gain.value = 3.0;
   reverbGain.connect(masterGain);
   context.decodeAudioData(reverbBuffer, function(audioData) {
     reverb = context.createConvolver();
