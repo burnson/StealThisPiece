@@ -35,7 +35,7 @@ function configureReverb () {
   masterGain.connect(context.destination);
 
   reverbGain = context.createGain();
-  reverbGain.gain.value = 3.0;
+  reverbGain.gain.value = 1.0;
   reverbGain.connect(masterGain);
   
   predestination = reverbGain;

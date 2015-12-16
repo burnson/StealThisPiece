@@ -1,5 +1,5 @@
 function setPiece () {
-  setThoughtfulPiece();
+  setConcertStealThisPiece();
 }
 
 function setConcertStealThisPiece () {
