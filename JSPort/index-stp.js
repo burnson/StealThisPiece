@@ -117,354 +117,7 @@ function setConcertStealThisPiece () {
   probabilities.DoubleBassLouder = 10;
 }
 
-function setDancePiece () {
-  piece = {};
-  piece.seed = 62;
-  piece.loopContinueRate = 20;
-  piece.codeLength = 3000;
-  piece.tapeLength = 2;
-  piece.loopStep = 200;
-  piece.loopSkipCreateRate = 4;
-  piece.loopInnerStartLow = 180;
-  piece.loopInnerStartHigh = 100;
-  piece.loopInnerEndLow = 100;
-  piece.loopInnerEndHigh = 100;
-  piece.loopOuterEndLow = 50;
-  piece.loopOuterEndHigh = 50;
-  piece.longestNote = 2;
-  piece.probabilityInversionSections = 12;
-  piece.computationRateInversion = 0.9975;
-  piece.range = 12;
-  piece.tempo = 500;
-  piece.rhythmSixteenth = true;
-  piece.rhythmTripletEighth = false;
-  piece.rhythmEighth = true;
-  piece.rhythmTripletQuarter = false;
-  piece.rhythmQuarter = true;
-  piece.useHairpins = true;
-  piece.wrapDynamics = true;
-  piece.pitchClass = [
-    true, false, true, false,
-    true, true, false, true,
-    false, true, false, true
-  ];
-  
-  probabilities = {};
-  probabilities.MoveBackward = 200000;
-  probabilities.MoveForward = 200000;
-  probabilities.DecrementData = 400000;
-  probabilities.IncrementData = 10000000;
-  probabilities.DecrementDuration = 5700;
-  probabilities.IncrementDuration = 5000;
-  probabilities.EmitFlute = 0;
-  probabilities.EmitOboe = 220;
-  probabilities.EmitClarinet = 200;
-  probabilities.EmitBassoon = 200;
-  probabilities.EmitHorn = 200;
-  probabilities.EmitTrumpet = 200;
-  probabilities.EmitTrombone = 200;
-  probabilities.EmitBaritoneSax = 200;
-  probabilities.EmitVibraphone = 510;
-  probabilities.EmitCrotales = 200;
-  probabilities.EmitViolin = 500;
-  probabilities.EmitViola = 0;
-  probabilities.EmitCello = 410;
-  probabilities.EmitDoubleBass = 0;
-  probabilities.ToggleWinds = 1000;
-  probabilities.ToggleBrass = 1000;
-  probabilities.TogglePercussion = 1000;
-  probabilities.ToggleStrings = 1000;
-  probabilities.FluteSoft = 10;
-  probabilities.FluteLoud = 10;
-  probabilities.FluteSofter = 10;
-  probabilities.FluteLouder = 10;
-  probabilities.OboeSoft = 10;
-  probabilities.OboeLoud = 10;
-  probabilities.OboeSofter = 10;
-  probabilities.OboeLouder = 10;
-  probabilities.ClarinetSoft = 10;
-  probabilities.ClarinetLoud = 10;
-  probabilities.ClarinetSofter = 10;
-  probabilities.ClarinetLouder = 10;
-  probabilities.BassoonSoft = 10;
-  probabilities.BassoonLoud = 10;
-  probabilities.BassoonSofter = 10;
-  probabilities.BassoonLouder = 10;
-  probabilities.HornSoft = 10;
-  probabilities.HornLoud = 10;
-  probabilities.HornSofter = 10;
-  probabilities.HornLouder = 10;
-  probabilities.TrumpetSoft = 10;
-  probabilities.TrumpetLoud = 10;
-  probabilities.TrumpetSofter = 10;
-  probabilities.TrumpetLouder = 10;
-  probabilities.TromboneSoft = 10;
-  probabilities.TromboneLoud = 10;
-  probabilities.TromboneSofter = 10;
-  probabilities.TromboneLouder = 10;
-  probabilities.BaritoneSaxSoft = 10;
-  probabilities.BaritoneSaxLoud = 10;
-  probabilities.BaritoneSaxSofter = 10;
-  probabilities.BaritoneSaxLouder = 10;
-  probabilities.VibraphoneSoft = 10;
-  probabilities.VibraphoneLoud = 10;
-  probabilities.VibraphoneSofter = 10;
-  probabilities.VibraphoneLouder = 10;
-  probabilities.CrotalesSoft = 10;
-  probabilities.CrotalesLoud = 10;
-  probabilities.CrotalesSofter = 10;
-  probabilities.CrotalesLouder = 10;
-  probabilities.ViolinSoft = 10;
-  probabilities.ViolinLoud = 10;
-  probabilities.ViolinSofter = 10;
-  probabilities.ViolinLouder = 10;
-  probabilities.ViolaSoft = 10;
-  probabilities.ViolaLoud = 10;
-  probabilities.ViolaSofter = 10;
-  probabilities.ViolaLouder = 10;
-  probabilities.CelloSoft = 10;
-  probabilities.CelloLoud = 10;
-  probabilities.CelloSofter = 10;
-  probabilities.CelloLouder = 10;
-  probabilities.DoubleBassSoft = 10;
-  probabilities.DoubleBassLoud = 10;
-  probabilities.DoubleBassSofter = 10;
-  probabilities.DoubleBassLouder = 10;
-}
-
-
-function setBaroquePiece () {
-  piece = {};
-  piece.seed = 62;
-  piece.loopContinueRate = 20;
-  piece.codeLength = 3000;
-  piece.tapeLength = 2;
-  piece.loopStep = 200;
-  piece.loopSkipCreateRate = 4;
-  piece.loopInnerStartLow = 180;
-  piece.loopInnerStartHigh = 100;
-  piece.loopInnerEndLow = 100;
-  piece.loopInnerEndHigh = 100;
-  piece.loopOuterEndLow = 50;
-  piece.loopOuterEndHigh = 50;
-  piece.longestNote = 2;
-  piece.probabilityInversionSections = 12;
-  piece.computationRateInversion = 0.9975;
-  piece.range = 12;
-  piece.tempo = 216;
-  piece.rhythmSixteenth = true;
-  piece.rhythmTripletEighth = false;
-  piece.rhythmEighth = true;
-  piece.rhythmTripletQuarter = false;
-  piece.rhythmQuarter = true;
-  piece.useHairpins = true;
-  piece.wrapDynamics = true;
-  piece.pitchClass = [
-    true, false, true, false,
-    true, true, false, true,
-    false, true, false, true
-  ];
-  
-  probabilities = {};
-  probabilities.MoveBackward = 200000;
-  probabilities.MoveForward = 200000;
-  probabilities.DecrementData = 400000;
-  probabilities.IncrementData = 10000000;
-  probabilities.DecrementDuration = 5700;
-  probabilities.IncrementDuration = 5000;
-  probabilities.EmitFlute = 0;
-  probabilities.EmitOboe = 220;
-  probabilities.EmitClarinet = 200;
-  probabilities.EmitBassoon = 200;
-  probabilities.EmitHorn = 200;
-  probabilities.EmitTrumpet = 200;
-  probabilities.EmitTrombone = 200;
-  probabilities.EmitBaritoneSax = 200;
-  probabilities.EmitVibraphone = 0;
-  probabilities.EmitCrotales = 0;
-  probabilities.EmitViolin = 510;
-  probabilities.EmitViola = 200;
-  probabilities.EmitCello = 500;
-  probabilities.EmitDoubleBass = 410;
-  probabilities.ToggleWinds = 1000;
-  probabilities.ToggleBrass = 1000;
-  probabilities.TogglePercussion = 1000;
-  probabilities.ToggleStrings = 1000;
-  probabilities.FluteSoft = 10;
-  probabilities.FluteLoud = 10;
-  probabilities.FluteSofter = 10;
-  probabilities.FluteLouder = 10;
-  probabilities.OboeSoft = 10;
-  probabilities.OboeLoud = 10;
-  probabilities.OboeSofter = 10;
-  probabilities.OboeLouder = 10;
-  probabilities.ClarinetSoft = 10;
-  probabilities.ClarinetLoud = 10;
-  probabilities.ClarinetSofter = 10;
-  probabilities.ClarinetLouder = 10;
-  probabilities.BassoonSoft = 10;
-  probabilities.BassoonLoud = 10;
-  probabilities.BassoonSofter = 10;
-  probabilities.BassoonLouder = 10;
-  probabilities.HornSoft = 10;
-  probabilities.HornLoud = 10;
-  probabilities.HornSofter = 10;
-  probabilities.HornLouder = 10;
-  probabilities.TrumpetSoft = 10;
-  probabilities.TrumpetLoud = 10;
-  probabilities.TrumpetSofter = 10;
-  probabilities.TrumpetLouder = 10;
-  probabilities.TromboneSoft = 10;
-  probabilities.TromboneLoud = 10;
-  probabilities.TromboneSofter = 10;
-  probabilities.TromboneLouder = 10;
-  probabilities.BaritoneSaxSoft = 10;
-  probabilities.BaritoneSaxLoud = 10;
-  probabilities.BaritoneSaxSofter = 10;
-  probabilities.BaritoneSaxLouder = 10;
-  probabilities.VibraphoneSoft = 10;
-  probabilities.VibraphoneLoud = 10;
-  probabilities.VibraphoneSofter = 10;
-  probabilities.VibraphoneLouder = 10;
-  probabilities.CrotalesSoft = 10;
-  probabilities.CrotalesLoud = 10;
-  probabilities.CrotalesSofter = 10;
-  probabilities.CrotalesLouder = 10;
-  probabilities.ViolinSoft = 10;
-  probabilities.ViolinLoud = 10;
-  probabilities.ViolinSofter = 10;
-  probabilities.ViolinLouder = 10;
-  probabilities.ViolaSoft = 10;
-  probabilities.ViolaLoud = 10;
-  probabilities.ViolaSofter = 10;
-  probabilities.ViolaLouder = 10;
-  probabilities.CelloSoft = 10;
-  probabilities.CelloLoud = 10;
-  probabilities.CelloSofter = 10;
-  probabilities.CelloLouder = 10;
-  probabilities.DoubleBassSoft = 10;
-  probabilities.DoubleBassLoud = 10;
-  probabilities.DoubleBassSofter = 10;
-  probabilities.DoubleBassLouder = 10;
-}
-
-function setThoughtfulPiece () {
-  piece = {};
-  piece.seed = 1;
-  piece.loopContinueRate = 20;
-  piece.codeLength = 3000;
-  piece.tapeLength = 10;
-  piece.loopStep = 200;
-  piece.loopSkipCreateRate = 4;
-  piece.loopInnerStartLow = 180;
-  piece.loopInnerStartHigh = 100;
-  piece.loopInnerEndLow = 100;
-  piece.loopInnerEndHigh = 100;
-  piece.loopOuterEndLow = 50;
-  piece.loopOuterEndHigh = 50;
-  piece.longestNote = 4;
-  piece.probabilityInversionSections = 12;
-  piece.computationRateInversion = 0.9975;
-  piece.range = 12;
-  piece.tempo = 100;
-  piece.rhythmSixteenth = true;
-  piece.rhythmTripletEighth = false;
-  piece.rhythmEighth = true;
-  piece.rhythmTripletQuarter = false;
-  piece.rhythmQuarter = true;
-  piece.useHairpins = true;
-  piece.wrapDynamics = true;
-  piece.pitchClass = [
-    true, false, true, false,
-    true, true, false, true,
-    false, true, false, true
-  ];
-  
-  probabilities = {};
-  probabilities.MoveBackward = 200000;
-  probabilities.MoveForward = 200000;
-  probabilities.DecrementData = 400000;
-  probabilities.IncrementData = 100000;
-  probabilities.DecrementDuration = 5700;
-  probabilities.IncrementDuration = 5000;
-  probabilities.EmitFlute = 0;
-  probabilities.EmitOboe = 0;
-  probabilities.EmitClarinet = 0;
-  probabilities.EmitBassoon = 0;
-  probabilities.EmitHorn = 0;
-  probabilities.EmitTrumpet = 0;
-  probabilities.EmitTrombone = 0;
-  probabilities.EmitBaritoneSax = 0;
-  probabilities.EmitVibraphone = 200;
-  probabilities.EmitCrotales = 0;
-  probabilities.EmitViolin = 0;
-  probabilities.EmitViola = 0;
-  probabilities.EmitCello = 200;
-  probabilities.EmitDoubleBass = 0;
-  probabilities.ToggleWinds = 1000;
-  probabilities.ToggleBrass = 1000;
-  probabilities.TogglePercussion = 1000;
-  probabilities.ToggleStrings = 1000;
-  probabilities.FluteSoft = 10;
-  probabilities.FluteLoud = 10;
-  probabilities.FluteSofter = 10;
-  probabilities.FluteLouder = 10;
-  probabilities.OboeSoft = 10;
-  probabilities.OboeLoud = 10;
-  probabilities.OboeSofter = 10;
-  probabilities.OboeLouder = 10;
-  probabilities.ClarinetSoft = 10;
-  probabilities.ClarinetLoud = 10;
-  probabilities.ClarinetSofter = 10;
-  probabilities.ClarinetLouder = 10;
-  probabilities.BassoonSoft = 10;
-  probabilities.BassoonLoud = 10;
-  probabilities.BassoonSofter = 10;
-  probabilities.BassoonLouder = 10;
-  probabilities.HornSoft = 10;
-  probabilities.HornLoud = 10;
-  probabilities.HornSofter = 10;
-  probabilities.HornLouder = 10;
-  probabilities.TrumpetSoft = 10;
-  probabilities.TrumpetLoud = 10;
-  probabilities.TrumpetSofter = 10;
-  probabilities.TrumpetLouder = 10;
-  probabilities.TromboneSoft = 10;
-  probabilities.TromboneLoud = 10;
-  probabilities.TromboneSofter = 10;
-  probabilities.TromboneLouder = 10;
-  probabilities.BaritoneSaxSoft = 10;
-  probabilities.BaritoneSaxLoud = 10;
-  probabilities.BaritoneSaxSofter = 10;
-  probabilities.BaritoneSaxLouder = 10;
-  probabilities.VibraphoneSoft = 10;
-  probabilities.VibraphoneLoud = 10;
-  probabilities.VibraphoneSofter = 10;
-  probabilities.VibraphoneLouder = 10;
-  probabilities.CrotalesSoft = 10;
-  probabilities.CrotalesLoud = 10;
-  probabilities.CrotalesSofter = 10;
-  probabilities.CrotalesLouder = 10;
-  probabilities.ViolinSoft = 10;
-  probabilities.ViolinLoud = 10;
-  probabilities.ViolinSofter = 10;
-  probabilities.ViolinLouder = 10;
-  probabilities.ViolaSoft = 10;
-  probabilities.ViolaLoud = 10;
-  probabilities.ViolaSofter = 10;
-  probabilities.ViolaLouder = 10;
-  probabilities.CelloSoft = 10;
-  probabilities.CelloLoud = 10;
-  probabilities.CelloSofter = 10;
-  probabilities.CelloLouder = 10;
-  probabilities.DoubleBassSoft = 10;
-  probabilities.DoubleBassLoud = 10;
-  probabilities.DoubleBassSofter = 10;
-  probabilities.DoubleBassLouder = 10;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
-
 
 var piece = {}, probabilities = {}, random;
 
@@ -962,31 +615,27 @@ function isRunningUnderNodeJS() {
     Object.prototype.toString.call(global.process) === '[object process]';
 }
 
-function test () {
+function parityChecksum(s) {
+  var parity = 0, i;
+  for (i = 0; i < s.length; i++) {
+    parity = (parity + s.charCodeAt(i)) >>> 0;
+  }
+  return parity;
+}
+
+function generateInConsole () {
   createPiece();
-  //console.log(JSON.stringify(pieceAsMIDI(), null, 2));
   var finalPiece = pieceAsCSV();
   console.log('CSV of piece:')
   console.log(finalPiece);
-  console.log('Hash of CSV: ' + md5(finalPiece));
-
-  if(md5(finalPiece) !== '0ca494dc0a5994afc36e3529d7059f6a') {
+  console.log('Parity of CSV: ' + parityChecksum(finalPiece));
+  if(parityChecksum(finalPiece) !== 6820566) {
     console.log('WARNING: piece does not match reference');
   }
 }
 
-function testMath() {
-  var generator = createMultiplyWithCarryPRNG(123);
-  for(var i = 0; i < 1000; i++) {
-    console.log(generator.nextFloat());
-  }
-}
-
-
 ////////////////////////////////////////////////////////////////////////////////
 
-
-//A simple implementation of Marsaglia's Multiply-With-Carry PRNG.
 function createMultiplyWithCarryPRNG (seed) {
   var state = [];
   
@@ -1026,7 +675,7 @@ function createMultiplyWithCarryPRNG (seed) {
     nextFloat : function () {
       var high = this.next() * 0x100000;
       var low = this.next() >>> 12;
-      return (high + low) / 4503599627370496;
+      return (high + low) / Math.pow(2, 52);
     },
     
     nextIntBetween : function(a, b) {
@@ -1054,170 +703,338 @@ function createMultiplyWithCarryPRNG (seed) {
   return generator;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+function scheduleFluteNote (note, start, duration, gain) {
+  gain /= dBToGain(-28);
+  scheduleOscillator('sine', note, start, duration, gain,
+    [{time:0.3, dB:-32},{time:0.9, dB:-32},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 12, start, duration, gain,
+    [{time:0.1, dB:-38},{time:0.9, dB:-38},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 24, start, duration, gain,
+    [{time:0.3, dB:-42},{time:0.9, dB:-42},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 36, start, duration, gain,
+    [{time:0.3, dB:-48},{time:0.9, dB:-48},{time:1.0, dB:-100}]);
+}
+
+function scheduleOboeNote (note, start, duration, gain) {
+  gain /= dBToGain(-50);
+  scheduleOscillator('sine', note, start, duration, gain,
+    [{time:0.1, dB:-50},{time:0.9, dB:-50},{time:1.0, dB:-100}]);
+  scheduleOscillator('triangle', note + 12, start, duration, gain,
+    [{time:0.1, dB:-55},{time:0.9, dB:-55},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 24, start, duration, gain,
+    [{time:0.3, dB:-60},{time:0.9, dB:-60},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 36, start, duration, gain,
+    [{time:0.3, dB:-65},{time:0.9, dB:-65},{time:1.0, dB:-100}]);
+}
+
+function scheduleClarinetNote (note, start, duration, gain) {
+  gain /= dBToGain(-50);
+  scheduleOscillator('sine', note, start, duration, gain,
+    [{time:0.1, dB:-79},{time:0.9, dB:-79},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 12, start, duration, gain,
+    [{time:0.1, dB:-65},{time:0.9, dB:-65},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 24, start, duration, gain,
+    [{time:0.3, dB:-50},{time:0.9, dB:-50},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 36, start, duration, gain,
+    [{time:0.3, dB:-55},{time:0.9, dB:-55},{time:1.0, dB:-100}]);
+}
+
+function scheduleBassoonNote (note, start, duration, gain) {
+  gain /= dBToGain(-55);
+  scheduleOscillator('sine', note, start, duration, gain,
+    [{time:0.05, dB:-65},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 12, start, duration, gain,
+    [{time:0.05, dB:-68},{time:0.95, dB:-68},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 24, start, duration, gain,
+    [{time:0.05, dB:-58},{time:0.95, dB:-58},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 48, start, duration, gain,
+    [{time:0.05, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
+}
+
+function scheduleHornNote (note, start, duration, gain) {
+  gain /= dBToGain(-55);
+  scheduleOscillator('triangle', note, start, duration, gain,
+    [{time:0.05, dB:-65},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+  scheduleOscillator('triangle', note + 12, start, duration, gain,
+    [{time:0.05, dB:-68},{time:0.95, dB:-68},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 24, start, duration, gain,
+    [{time:0.2, dB:-58},{time:0.95, dB:-58},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 48, start, duration, gain,
+    [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
+}
+
+function scheduleTromboneNote (note, start, duration, gain) {
+  gain /= dBToGain(-55);
+  scheduleOscillator('triangle', note, start, duration, gain,
+    [{time:0.05, dB:-65},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+  scheduleOscillator('sawtooth', note + 12, start, duration, gain,
+    [{time:0.05, dB:-55},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 24, start, duration, gain,
+    [{time:0.2, dB:-58},{time:0.95, dB:-58},{time:1.0, dB:-100}]);
+  scheduleOscillator('square', note + 48, start, duration, gain,
+    [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
+}
+
+function scheduleTrumpetNote (note, start, duration, gain) {
+  gain /= dBToGain(-55);
+  scheduleOscillator('triangle', note, start, duration, gain,
+    [{time:0.05, dB:-65},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+  scheduleOscillator('sawtooth', note + 12, start, duration, gain,
+    [{time:0.05, dB:-55},{time:0.95, dB:-60},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 24, start, duration, gain,
+    [{time:0.2, dB:-58},{time:0.95, dB:-58},{time:1.0, dB:-100}]);
+  scheduleOscillator('square', note + 48, start, duration, gain,
+    [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
+}
+
+function scheduleBaritoneSaxNote (note, start, duration, gain) {
+  gain /= dBToGain(-50);
+  scheduleOscillator('square', note, start, duration, gain,
+    [{time:0.05, dB:-62},{time:0.15, dB:-65},{time:0.95, dB:-65},
+    {time:1.0, dB:-100}]);
+  scheduleOscillator('triangle', note + 12, start, duration, gain,
+    [{time:0.05, dB:-52},{time:0.15, dB:-55},{time:0.95, dB:-55},
+    {time:1.0, dB:-100}]);
+  scheduleOscillator('triangle', note + 24, start, duration, gain,
+    [{time:0.05, dB:-58},{time:0.15, dB:-58},{time:0.95, dB:-58},
+    {time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 48, start, duration, gain,
+    [{time:0.05, dB:-75},{time:0.15, dB:-75},{time:0.95, dB:-75},
+    {time:1.0, dB:-100}]);
+}
+
+function scheduleVibraphoneNote (note, start, duration, gain) {
+  gain /= dBToGain(-6);
+  scheduleOscillator('triangle', note, start, duration, gain,
+    [{time:0.05, dB:-3},{time:0.15, dB:-12},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 12, start, duration, gain,
+    [{time:0.05, dB:-6},{time:0.15, dB:-6},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 24, start, duration, gain,
+    [{time:0.05, dB:-12},{time:0.15, dB:-42},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 48, start, duration, gain,
+    [{time:0.05, dB:-24},{time:0.15, dB:-54},{time:1.0, dB:-100}]);
+}
+
+function scheduleCrotalesNote (note, start, duration, gain) {
+  gain /= dBToGain(-12);
+  scheduleOscillator('sine', note, start, duration, gain,
+    [{time:0.01, dB:-3},{time:0.05, dB:-30},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 12, start, duration, gain,
+    [{time:0.05, dB:-6},{time:0.15, dB:-12},{time:1.0, dB:-100}]);
+  scheduleOscillator('triangle', note + 24, start, duration, gain,
+    [{time:0.01, dB:-12},{time:0.05, dB:-30},{time:1.0, dB:-100}]);
+  scheduleOscillator('triangle', note + 48, start, duration, gain,
+    [{time:0.01, dB:-24},{time:0.05, dB:-30},{time:1.0, dB:-100}]);
+}
+
+function scheduleViolinNote (note, start, duration, gain) {
+  gain /= dBToGain(-55);
+  scheduleOscillator('triangle', note, start, duration, gain,
+    [{time:0.05, dB:-85},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+  scheduleOscillator('sawtooth', note + 12, start, duration, gain,
+    [{time:0.05, dB:-85},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 24, start, duration, gain,
+    [{time:0.2, dB:-58},{time:0.95, dB:-58},{time:1.0, dB:-100}]);
+  scheduleOscillator('square', note + 48, start, duration, gain,
+    [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
+}
+
+function scheduleViolaNote (note, start, duration, gain) {
+  gain /= dBToGain(-55);
+  scheduleOscillator('triangle', note, start, duration, gain,
+    [{time:0.05, dB:-85},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+  scheduleOscillator('sawtooth', note + 12, start, duration, gain,
+    [{time:0.05, dB:-85},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 24, start, duration, gain,
+    [{time:0.2, dB:-58},{time:0.95, dB:-58},{time:1.0, dB:-100}]);
+  scheduleOscillator('square', note + 48, start, duration, gain,
+    [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
+}
+
+function scheduleCelloNote (note, start, duration, gain) {
+  gain /= dBToGain(-55);
+  scheduleOscillator('triangle', note, start, duration, gain,
+    [{time:0.05, dB:-85},{time:0.95, dB:-60},{time:1.0, dB:-100}]);
+  scheduleOscillator('sawtooth', note + 12, start, duration, gain,
+    [{time:0.05, dB:-85},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 24, start, duration, gain,
+    [{time:0.2, dB:-58},{time:0.95, dB:-58},{time:1.0, dB:-100}]);
+  scheduleOscillator('square', note + 48, start, duration, gain,
+    [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
+}
+
+function scheduleDoubleBassNote (note, start, duration, gain) {
+  gain /= dBToGain(-55);
+  scheduleOscillator('triangle', note, start, duration, gain,
+    [{time:0.05, dB:-85},{time:0.95, dB:-60},{time:1.0, dB:-100}]);
+  scheduleOscillator('sawtooth', note + 12, start, duration, gain,
+    [{time:0.05, dB:-85},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+  scheduleOscillator('sine', note + 24, start, duration, gain,
+    [{time:0.2, dB:-58},{time:0.95, dB:-58},{time:1.0, dB:-100}]);
+  scheduleOscillator('square', note + 48, start, duration, gain,
+    [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
+var context = new (window.AudioContext || window.webkitAudioContext)();
+reverbjs.extend(context);
+var midiQueue;
+var playerStartTime;
+var timeInAdvanceToSchedule = 0.5;
+var predestination = context.destination;
+var reverbGain;
+var masterGain;
+var reverb;
 
-// MD5 implementation: http://www.myersdaily.org/joseph/javascript/md5-text.html
-function md5(s) {
-  function md5cycle(x, k) {
-    var a = x[0], b = x[1], c = x[2], d = x[3];
-    a = ff(a, b, c, d, k[0], 7, -680876936);
-    d = ff(d, a, b, c, k[1], 12, -389564586);
-    c = ff(c, d, a, b, k[2], 17, 606105819);
-    b = ff(b, c, d, a, k[3], 22, -1044525330);
-    a = ff(a, b, c, d, k[4], 7, -176418897);
-    d = ff(d, a, b, c, k[5], 12,  1200080426);
-    c = ff(c, d, a, b, k[6], 17, -1473231341);
-    b = ff(b, c, d, a, k[7], 22, -45705983);
-    a = ff(a, b, c, d, k[8], 7, 1770035416);
-    d = ff(d, a, b, c, k[9], 12, -1958414417);
-    c = ff(c, d, a, b, k[10], 17, -42063);
-    b = ff(b, c, d, a, k[11], 22, -1990404162);
-    a = ff(a, b, c, d, k[12], 7,  1804603682);
-    d = ff(d, a, b, c, k[13], 12, -40341101);
-    c = ff(c, d, a, b, k[14], 17, -1502002290);
-    b = ff(b, c, d, a, k[15], 22, 1236535329);
-    a = gg(a, b, c, d, k[1], 5, -165796510);
-    d = gg(d, a, b, c, k[6], 9, -1069501632);
-    c = gg(c, d, a, b, k[11], 14, 643717713);
-    b = gg(b, c, d, a, k[0], 20, -373897302);
-    a = gg(a, b, c, d, k[5], 5, -701558691);
-    d = gg(d, a, b, c, k[10], 9, 38016083);
-    c = gg(c, d, a, b, k[15], 14, -660478335);
-    b = gg(b, c, d, a, k[4], 20, -405537848);
-    a = gg(a, b, c, d, k[9], 5,  568446438);
-    d = gg(d, a, b, c, k[14], 9, -1019803690);
-    c = gg(c, d, a, b, k[3], 14, -187363961);
-    b = gg(b, c, d, a, k[8], 20, 1163531501);
-    a = gg(a, b, c, d, k[13], 5, -1444681467);
-    d = gg(d, a, b, c, k[2], 9, -51403784);
-    c = gg(c, d, a, b, k[7], 14, 1735328473);
-    b = gg(b, c, d, a, k[12], 20, -1926607734);
-    a = hh(a, b, c, d, k[5], 4, -378558);
-    d = hh(d, a, b, c, k[8], 11, -2022574463);
-    c = hh(c, d, a, b, k[11], 16, 1839030562);
-    b = hh(b, c, d, a, k[14], 23, -35309556);
-    a = hh(a, b, c, d, k[1], 4, -1530992060);
-    d = hh(d, a, b, c, k[4], 11, 1272893353);
-    c = hh(c, d, a, b, k[7], 16, -155497632);
-    b = hh(b, c, d, a, k[10], 23, -1094730640);
-    a = hh(a, b, c, d, k[13], 4, 681279174);
-    d = hh(d, a, b, c, k[0], 11, -358537222);
-    c = hh(c, d, a, b, k[3], 16, -722521979);
-    b = hh(b, c, d, a, k[6], 23, 76029189);
-    a = hh(a, b, c, d, k[9], 4, -640364487);
-    d = hh(d, a, b, c, k[12], 11, -421815835);
-    c = hh(c, d, a, b, k[15], 16, 530742520);
-    b = hh(b, c, d, a, k[2], 23, -995338651);
-    a = ii(a, b, c, d, k[0], 6, -198630844);
-    d = ii(d, a, b, c, k[7], 10, 1126891415);
-    c = ii(c, d, a, b, k[14], 15, -1416354905);
-    b = ii(b, c, d, a, k[5], 21, -57434055);
-    a = ii(a, b, c, d, k[12], 6, 1700485571);
-    d = ii(d, a, b, c, k[3], 10, -1894986606);
-    c = ii(c, d, a, b, k[10], 15, -1051523);
-    b = ii(b, c, d, a, k[1], 21, -2054922799);
-    a = ii(a, b, c, d, k[8], 6, 1873313359);
-    d = ii(d, a, b, c, k[15], 10, -30611744);
-    c = ii(c, d, a, b, k[6], 15, -1560198380);
-    b = ii(b, c, d, a, k[13], 21, 1309151649);
-    a = ii(a, b, c, d, k[4], 6, -145523070);
-    d = ii(d, a, b, c, k[11], 10, -1120210379);
-    c = ii(c, d, a, b, k[2], 15, 718787259);
-    b = ii(b, c, d, a, k[9], 21, -343485551);
-    x[0] = add32(a, x[0]);
-    x[1] = add32(b, x[1]);
-    x[2] = add32(c, x[2]);
-    x[3] = add32(d, x[3]);
-  }
+function configureReverb () {
+  masterGain = context.createGain();
+  masterGain.gain.value = 1.0;
+  masterGain.connect(context.destination);
 
-  function cmn(q, a, b, x, s, t) {
-    a = add32(add32(a, q), add32(x, t));
-    return add32((a << s) | (a >>> (32 - s)), b);
-  }
+  reverbGain = context.createGain();
+  reverbGain.gain.value = 1.0;
+  reverbGain.connect(masterGain);
+  
+  predestination = reverbGain;
 
-  function ff(a, b, c, d, x, s, t) {
-    return cmn((b & c) | ((~b) & d), a, b, x, s, t);
-  }
-
-  function gg(a, b, c, d, x, s, t) {
-    return cmn((b & d) | (c & (~d)), a, b, x, s, t);
-  }
-
-  function hh(a, b, c, d, x, s, t) {
-    return cmn(b ^ c ^ d, a, b, x, s, t);
-  }
-
-  function ii(a, b, c, d, x, s, t) {
-    return cmn(c ^ (b | (~d)), a, b, x, s, t);
-  }
-
-  function md51(s) {
-    txt = '';
-    var n = s.length,
-    state = [1732584193, -271733879, -1732584194, 271733878], i;
-    for (i = 64; i <= s.length; i += 64) {
-      md5cycle(state, md5blk(s.substring(i - 64, i)));
-    }
-    s = s.substring(i - 64);
-    var tail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    for (i = 0; i < s.length; i++) {
-      tail[i >> 2] |= s.charCodeAt(i) << ((i % 4) << 3);
-    }
-    tail[i >> 2] |= 0x80 << ((i % 4) << 3);
-    if (i > 55) {
-      md5cycle(state, tail);
-      for (i = 0; i < 16; i++) {
-        tail[i] = 0;
-      }
-    }
-    tail[14] = n * 8;
-    md5cycle(state, tail);
-    return state;
-  }
-
-  function md5blk(s) {
-    var md5blks = [], i;
-    for (i = 0; i < 64; i += 4) {
-      md5blks[i >> 2] = s.charCodeAt(i)
-        + (s.charCodeAt(i + 1) << 8)
-        + (s.charCodeAt(i + 2) << 16)
-        + (s.charCodeAt(i + 3) << 24);
-    }
-    return md5blks;
-  }
-
-  var hex_chr = '0123456789abcdef'.split('');
-
-  function rhex(n) {
-    var s = '', j = 0;
-    for(; j < 4; j++) {
-      s += hex_chr[(n >> (j * 8 + 4)) & 0x0F] + hex_chr[(n >> (j * 8)) & 0x0F];
-    }
-    return s;
-  }
-
-  function hex(x) {
-    for (var i = 0; i < x.length; i++)
-    x[i] = rhex(x[i]);
-    return x.join('');
-  }
-
-  function add32(a, b) {
-    return (a + b) & 0xFFFFFFFF;
-  }
-  return hex(md51(s));
+  reverb = context.createReverbFromUrl(
+    'http://reverbjs.org/Library/UndergroundCarPark.wav',
+    function() { console.log('Loaded reverb'); });
+  reverbGain.connect(reverb);
+  reverb.connect(masterGain);
 }
 
-if (md5('hello') != '5d41402abc4b2a76b9719d911017c592') {
-  console.log('Warning: MD5 self test failed.');
+function dBToGain(dB) {
+  if (dB <= -100) {
+    return 0;
+  }
+  return Math.pow(10, dB / 10);
 }
 
+function frequencyToMIDINoteNumber (frequency) {
+  var n = 12 * Math.log(frequency * Math.pow(2, 11 / 4) / 55) / Math.log(2);
+  var rounded = Math.round(n * 128) / 128;
+  return rounded;
+}
+
+function getCurrentTime() {
+  return context.currentTime;
+}
+
+function getPieceAsMIDI() {
+  createPiece();
+  exampleData = pieceAsMIDI();
+  var csv = pieceAsCSV();
+  if (parityChecksum(csv) !== 6820566) {
+    alert('Warning: piece has changed!');
+  }
+  console.log('Parity of CSV: ' + parityChecksum(csv));
+  var sortKey = "time";
+  exampleData.sort(function(a, b) {
+    if (a[sortKey] < b[sortKey]) {
+      return -1;
+    } else if (a[sortKey] > b[sortKey]) {
+      return 1;
+    }
+    return 0;
+  });
+  return exampleData;
+}
+
+function initialize () {
+  configureReverb();
+  schedulePiece();
+}
+
+function midiNoteNumberToFrequency (midiNoteNumber) {
+  return 55 * Math.pow(2, (midiNoteNumber - 33) / 12);
+}
+
+function processNextFrame () {
+  if (midiQueue.length === 0) {
+    return;
+  }
+  var playerCurrentTime = getCurrentTime() - playerStartTime;
+  var playerScheduleTime = playerCurrentTime + timeInAdvanceToSchedule;
+  while (midiQueue[0] !== undefined && midiQueue[0].time < playerScheduleTime) {
+    var m = midiQueue.shift();
+    scheduleInstrumentalNote(m.channel, m.pitch, m.time + playerStartTime,
+      m.duration, m.velocity);
+  }
+  window.requestAnimationFrame(processNextFrame);
+}
+
+function scheduleInstrumentalNote (instrument, midiNoteNumber, startTime,
+  duration, velocity) {
+  if (velocity === undefined) {
+    velocity = 0.5;
+  } else {
+    velocity = Math.min(Math.max(velocity / 127, 0.01), 1);
+  }
+  var gain = 0.1 * velocity;
+  var instruments = [
+    scheduleFluteNote,
+    scheduleOboeNote,
+    scheduleClarinetNote,
+    scheduleBassoonNote,
+    scheduleHornNote,
+    scheduleTrumpetNote,
+    scheduleTromboneNote,
+    scheduleBaritoneSaxNote,
+    scheduleVibraphoneNote,
+    scheduleCrotalesNote,
+    scheduleViolinNote,
+    scheduleViolaNote,
+    scheduleCelloNote,
+    scheduleDoubleBassNote
+  ];
+  instruments[instrument](midiNoteNumber, startTime, duration, gain);
+}
+
+function schedulePiece () {
+  scheduleInstrumentalNote(0, 60, 0, 0, 0); //just to get things going
+  midiQueue = getPieceAsMIDI();
+  playerStartTime = getCurrentTime() + 1.0;
+  processNextFrame();
+}
+
+function scheduleOscillator(type, note, startTime, duration, gain, shape) {
+  if (startTime < getCurrentTime()) {
+    console.log('Warning: dropped note that started in past');
+    return;
+  }
+  var gainShaper = context.createGain();
+  gainShaper.gain.value = 0;
+  gainShaper.gain.setValueAtTime(0, startTime);
+  for (var i in shape) {
+    var g = dBToGain(shape[i].dB) * gain;
+    var t = startTime + shape[i].time * duration;
+    gainShaper.gain.linearRampToValueAtTime(g, t);
+  }
+  gainShaper.connect(predestination);
+  
+  var oscillator = context.createOscillator();
+  oscillator.type = type;
+  oscillator.frequency.value = midiNoteNumberToFrequency(note);
+  oscillator.start(startTime);
+  oscillator.stop(startTime + duration);
+  oscillator.connect(gainShaper);
+}
+
+function shutdownGracefully() {
+  console.log('Shutting down audio...');
+  var start = getCurrentTime(), length = 0.5, progress = 0;
+  while (progress <= 1) {
+    masterGain.gain.value = 1 - progress;
+    progress = (getCurrentTime() - start) / length;
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-
 
 if (isRunningUnderNodeJS()) {
-  test();
+  generateInConsole();
 }

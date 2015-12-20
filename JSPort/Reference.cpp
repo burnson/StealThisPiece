@@ -700,7 +700,10 @@ void CreatePiece(void)
   String CSVOfPiece = PieceAsCSV();
   c >> "CSV of piece:";
   c >> CSVOfPiece;
-  c >> "Hash of CSV: " << MD5::Hex(CSVOfPiece.Merge());
+  uint32 Parity = 0;
+  for(count i = 0; i < CSVOfPiece.n(); i++)
+    Parity += (uint32)CSVOfPiece[i];
+  c >> "Parity of CSV: " << (int64)Parity;
   c++;
   return;
   
