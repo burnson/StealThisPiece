@@ -1,8 +1,4 @@
 function setPiece () {
-  setConcertStealThisPiece();
-}
-
-function setConcertStealThisPiece () {
   piece = {};
   piece.seed = 133;
   piece.loopContinueRate = 5;
@@ -120,6 +116,17 @@ function setConcertStealThisPiece () {
 ////////////////////////////////////////////////////////////////////////////////
 
 var piece = {}, probabilities = {}, random;
+var durationIndex = 0;
+var durations = [];
+var durationLCM = 48;
+var instruments = [];
+var toggles = [true, true, true, true];
+var instructions = [], data = [];
+var instructionPointer = 0;
+var dataPointer = 0;
+var globalTime = 0;
+var dynamics = 7;
+var dynamic = [0, 1, 2, 3, 4, 5, 6];
 
 function distributeProbabilities (amount)
 {
@@ -148,89 +155,25 @@ function distributeProbabilities (amount)
 
 // Instruction set
 var nameOf = [
-  "NullOp",
-  "WhileBegin",
-  "WhileEnd",
-  "MoveBackward",
-  "MoveForward",
-  "DecrementData",
-  "IncrementData",
-  "DecrementDuration",
-  "IncrementDuration",
-  "EmitFlute",
-  "EmitOboe",
-  "EmitClarinet",
-  "EmitBassoon",
-  "EmitHorn",
-  "EmitTrumpet",
-  "EmitTrombone",
-  "EmitBaritoneSax",
-  "EmitVibraphone",
-  "EmitCrotales",
-  "EmitViolin",
-  "EmitViola",
-  "EmitCello",
-  "EmitDoubleBass",
-  "ToggleWinds",
-  "ToggleBrass",
-  "TogglePercussion",
-  "ToggleStrings",
-  "FluteSoft",
-  "FluteLoud",
-  "FluteSofter",
-  "FluteLouder",
-  "OboeSoft",
-  "OboeLoud",
-  "OboeSofter",
-  "OboeLouder",
-  "ClarinetSoft",
-  "ClarinetLoud",
-  "ClarinetSofter",
-  "ClarinetLouder",
-  "BassoonSoft",
-  "BassoonLoud",
-  "BassoonSofter",
-  "BassoonLouder",
-  "HornSoft",
-  "HornLoud",
-  "HornSofter",
-  "HornLouder",
-  "TrumpetSoft",
-  "TrumpetLoud",
-  "TrumpetSofter",
-  "TrumpetLouder",
-  "TromboneSoft",
-  "TromboneLoud",
-  "TromboneSofter",
-  "TromboneLouder",
-  "BaritoneSaxSoft",
-  "BaritoneSaxLoud",
-  "BaritoneSaxSofter",
-  "BaritoneSaxLouder",
-  "VibraphoneSoft",
-  "VibraphoneLoud",
-  "VibraphoneSofter",
-  "VibraphoneLouder",
-  "CrotalesSoft",
-  "CrotalesLoud",
-  "CrotalesSofter",
-  "CrotalesLouder",
-  "ViolinSoft",
-  "ViolinLoud",
-  "ViolinSofter",
-  "ViolinLouder",
-  "ViolaSoft",
-  "ViolaLoud",
-  "ViolaSofter",
-  "ViolaLouder",
-  "CelloSoft",
-  "CelloLoud",
-  "CelloSofter",
-  "CelloLouder",
-  "DoubleBassSoft",
-  "DoubleBassLoud",
-  "DoubleBassSofter",
-  "DoubleBassLouder",
+  "NullOp", "WhileBegin", "WhileEnd", "MoveBackward", "MoveForward",
+  "DecrementData", "IncrementData", "DecrementDuration", "IncrementDuration",
+  "EmitFlute", "EmitOboe", "EmitClarinet", "EmitBassoon", "EmitHorn",
+  "EmitTrumpet", "EmitTrombone", "EmitBaritoneSax", "EmitVibraphone",
+  "EmitCrotales", "EmitViolin", "EmitViola", "EmitCello", "EmitDoubleBass",
+  "ToggleWinds", "ToggleBrass", "TogglePercussion", "ToggleStrings",
+  "FluteSoft", "FluteLoud", "FluteSofter", "FluteLouder", "OboeSoft",
+  "OboeLoud", "OboeSofter", "OboeLouder", "ClarinetSoft", "ClarinetLoud",
+  "ClarinetSofter", "ClarinetLouder", "BassoonSoft", "BassoonLoud",
+  "BassoonSofter", "BassoonLouder", "HornSoft", "HornLoud", "HornSofter",
+  "HornLouder", "TrumpetSoft", "TrumpetLoud", "TrumpetSofter", "TrumpetLouder",
+  "TromboneSoft", "TromboneLoud", "TromboneSofter", "TromboneLouder",
+  "BaritoneSaxSoft", "BaritoneSaxLoud", "BaritoneSaxSofter",
+  "BaritoneSaxLouder", "VibraphoneSoft", "VibraphoneLoud",
+  "VibraphoneSofter", "VibraphoneLouder", "CrotalesSoft", "CrotalesLoud",
+  "CrotalesSofter", "CrotalesLouder", "ViolinSoft", "ViolinLoud",
+  "ViolinSofter", "ViolinLouder", "ViolaSoft", "ViolaLoud", "ViolaSofter",
+  "ViolaLouder", "CelloSoft", "CelloLoud", "CelloSofter", "CelloLouder",
+  "DoubleBassSoft", "DoubleBassLoud", "DoubleBassSofter", "DoubleBassLouder",
   "InstructionCount"
 ];
 
@@ -242,10 +185,6 @@ var indexOf = function () {
   return x;
 }();
 
-// Rhythm
-var durationIndex = 0;
-var durations = [];
-var durationLCM = 48;
 function createDurations () {
   if (piece.rhythmSixteenth) durations.push(durationLCM * 1 / 16);
   if (piece.rhythmTripletEighth) durations.push(durationLCM * 1 / 12);
@@ -253,11 +192,6 @@ function createDurations () {
   if (piece.rhythmTripletQuarter) durations.push(durationLCM * 1 / 6);
   if (piece.rhythmQuarter) durations.push(durationLCM * 1 / 4);
 }
-
-// Instruments
-
-var instruments = [];
-var toggles = [true, true, true, true];
 
 function makeInstrument (index, group, name, low, high) {
   return {
@@ -289,17 +223,11 @@ function createInstruments () {
   i.push(makeInstrument(12, 3, "Cello",       36, 67 + piece.range)); //C2-G5
   i.push(makeInstrument(13, 3, "DoubleBass",  28, 48 + piece.range)); //E2-C4
   instruments = i;
-  
-  /*Note: Violin is reassigned to group 2 below to express the behavior of a bug
-  in the original where the Violin was considered part of the percussion group
-  for toggling purposes. If backwards compatibility is not a concern then this
-  line can be removed.*/
+
+  /*Backwards compatibility to express original behavior where Violin was
+  considered part of the percussion group for toggling. This could be removed.*/
   instruments[10].group = 2;
 }
-
-var instructions = [], data = [];
-var instructionPointer = 0;
-var dataPointer = 0;
 
 function planLoops () {
   var a = piece.loopInnerStartLow;
@@ -338,8 +266,7 @@ function getProbableInstruction (normalizedNumber) {
 function planInstructions () {
   var i, n = instructions.length;
   var inversionProbability;
-  for(i = 0; i < n; i++)
-  {
+  for(i = 0; i < n; i++) {
     setPiece();
     inversionProbability = (Math.floor(i / Math.floor(n /
       piece.probabilityInversionSections)) % 2);
@@ -349,10 +276,6 @@ function planInstructions () {
   }
 }
 
-var cycleCount = 0;
-var lowestDataAccess = 0;
-var highestDataAccess = 0;
-
 function halt() {
   return instructionPointer >= instructions.length || instructionPointer < 0;
 }
@@ -361,26 +284,15 @@ function getInstruction () {
   return nameOf[instructions[instructionPointer]];
 }
 
-function updateDataAccess () {
-  if (dataPointer < lowestDataAccess) {
-    lowestDataAccess = dataPointer;
-  }
-  if (dataPointer > highestDataAccess) {
-    highestDataAccess = dataPointer;
-  }
-}
-
 function getCyclicDataPointer () {
   return (dataPointer + data.length * Math.abs(dataPointer)) % data.length;
 }
 
 function getData () {
-  updateDataAccess();
   return data[getCyclicDataPointer()];
 }
 
 function addToData (amount) {
-  updateDataAccess();
   var x = getCyclicDataPointer();
   data[x] = (data[x] + amount + 256) % 256;
 }
@@ -428,10 +340,6 @@ function lookupPitch(instrument, p) {
   }
   return noteStart;
 }
-
-var globalTime = 0;
-var dynamics = 7;
-var dynamic = [0, 1, 2, 3, 4, 5, 6];
 
 function makeNote (offset, duration, pitch, dynamicMark) {
   var n = {
@@ -513,7 +421,6 @@ function emit (i) {
 }
 
 function performInstruction () {
-  cycleCount++;
   if (halt()) return false;
   var i = getInstruction();
   if (i === "MoveForward") dataPointer++;
@@ -570,14 +477,9 @@ function pieceAsCSV () {
     var instrument = instruments[i];
     for (j = 0; j < instrument.notes.length; j++) {
       var note = instrument.notes[j];
-      var s = instrument.name;
-      s += ',' + instrument.index;
-      s += ',' + note.time;
-      s += ',' + note.duration;
-      s += ',' + note.pitch;
-      s += ',' + note.dynamicMark;
-      s += "\n";
-      pieceString += s;
+      pieceString += instrument.name + ',' + instrument.index + ',' +
+        note.time + ',' + note.duration + ',' + note.pitch + ',' +
+        note.dynamicMark + '\n'
     }
   }
   return pieceString.trim();
@@ -626,8 +528,7 @@ function parityChecksum(s) {
 function generateInConsole () {
   createPiece();
   var finalPiece = pieceAsCSV();
-  console.log('CSV of piece:')
-  console.log(finalPiece);
+  console.log('CSV of piece:\n' + finalPiece);
   console.log('Parity of CSV: ' + parityChecksum(finalPiece));
   if(parityChecksum(finalPiece) !== 6820566) {
     console.log('WARNING: piece does not match reference');
@@ -679,10 +580,6 @@ function createMultiplyWithCarryPRNG (seed) {
     },
     
     nextIntBetween : function(a, b) {
-      if (b < a) {
-        b = [a, a = b][0];
-        console.log("Warning: nextIntBetween got backwards range");
-      }
       return Math.floor(a + this.nextFloat() * (b - a));
     },
     
@@ -718,7 +615,7 @@ function scheduleFluteNote (note, start, duration, gain) {
 }
 
 function scheduleOboeNote (note, start, duration, gain) {
-  gain /= dBToGain(-50);
+  gain /= dBToGain(-47);
   scheduleOscillator('sine', note, start, duration, gain,
     [{time:0.1, dB:-50},{time:0.9, dB:-50},{time:1.0, dB:-100}]);
   scheduleOscillator('triangle', note + 12, start, duration, gain,
@@ -766,7 +663,7 @@ function scheduleHornNote (note, start, duration, gain) {
 }
 
 function scheduleTromboneNote (note, start, duration, gain) {
-  gain /= dBToGain(-55);
+  gain /= dBToGain(-58);
   scheduleOscillator('triangle', note, start, duration, gain,
     [{time:0.05, dB:-65},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
   scheduleOscillator('sawtooth', note + 12, start, duration, gain,
@@ -778,7 +675,7 @@ function scheduleTromboneNote (note, start, duration, gain) {
 }
 
 function scheduleTrumpetNote (note, start, duration, gain) {
-  gain /= dBToGain(-55);
+  gain /= dBToGain(-50);
   scheduleOscillator('triangle', note, start, duration, gain,
     [{time:0.05, dB:-65},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
   scheduleOscillator('sawtooth', note + 12, start, duration, gain,
@@ -842,11 +739,11 @@ function scheduleViolinNote (note, start, duration, gain) {
 }
 
 function scheduleViolaNote (note, start, duration, gain) {
-  gain /= dBToGain(-55);
+  gain /= dBToGain(-50);
   scheduleOscillator('triangle', note, start, duration, gain,
     [{time:0.05, dB:-85},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
   scheduleOscillator('sawtooth', note + 12, start, duration, gain,
-    [{time:0.05, dB:-85},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+    [{time:0.05, dB:-75},{time:0.95, dB:-55},{time:1.0, dB:-100}]);
   scheduleOscillator('sine', note + 24, start, duration, gain,
     [{time:0.2, dB:-58},{time:0.95, dB:-58},{time:1.0, dB:-100}]);
   scheduleOscillator('square', note + 48, start, duration, gain,
@@ -854,27 +751,19 @@ function scheduleViolaNote (note, start, duration, gain) {
 }
 
 function scheduleCelloNote (note, start, duration, gain) {
-  gain /= dBToGain(-55);
-  scheduleOscillator('triangle', note, start, duration, gain,
-    [{time:0.05, dB:-85},{time:0.95, dB:-60},{time:1.0, dB:-100}]);
-  scheduleOscillator('sawtooth', note + 12, start, duration, gain,
-    [{time:0.05, dB:-85},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
-  scheduleOscillator('sine', note + 24, start, duration, gain,
-    [{time:0.2, dB:-58},{time:0.95, dB:-58},{time:1.0, dB:-100}]);
-  scheduleOscillator('square', note + 48, start, duration, gain,
-    [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
+  gain /= dBToGain(-50);
+  scheduleOscillator('triangle', note - 12, start, duration, gain,
+    [{time:0.05, dB:-75},{time:0.95, dB:-55},{time:1.0, dB:-100}]);
+  scheduleOscillator('sawtooth', note, start, duration, gain,
+    [{time:0.05, dB:-75},{time:0.95, dB:-55},{time:1.0, dB:-100}]);
 }
 
 function scheduleDoubleBassNote (note, start, duration, gain) {
-  gain /= dBToGain(-55);
-  scheduleOscillator('triangle', note, start, duration, gain,
-    [{time:0.05, dB:-85},{time:0.95, dB:-60},{time:1.0, dB:-100}]);
-  scheduleOscillator('sawtooth', note + 12, start, duration, gain,
-    [{time:0.05, dB:-85},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
-  scheduleOscillator('sine', note + 24, start, duration, gain,
-    [{time:0.2, dB:-58},{time:0.95, dB:-58},{time:1.0, dB:-100}]);
-  scheduleOscillator('square', note + 48, start, duration, gain,
-    [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
+  gain /= dBToGain(-50);
+  scheduleOscillator('sawtooth', note - 12, start, duration, gain,
+    [{time:0.05, dB:-75},{time:0.95, dB:-55},{time:1.0, dB:-100}]);
+  scheduleOscillator('sawtooth', note, start, duration, gain,
+    [{time:0.05, dB:-75},{time:0.95, dB:-55},{time:1.0, dB:-100}]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -891,7 +780,7 @@ var reverb;
 
 function configureReverb () {
   masterGain = context.createGain();
-  masterGain.gain.value = 1.0;
+  masterGain.gain.value = 0.5;
   masterGain.connect(context.destination);
 
   reverbGain = context.createGain();
@@ -901,7 +790,7 @@ function configureReverb () {
   predestination = reverbGain;
 
   reverb = context.createReverbFromUrl(
-    'http://reverbjs.org/Library/UndergroundCarPark.wav',
+    'http://reverbjs.org/Library/R1NuclearReactorHall.wav',
     function() { console.log('Loaded reverb'); });
   reverbGain.connect(reverb);
   reverb.connect(masterGain);
@@ -1025,10 +914,9 @@ function scheduleOscillator(type, note, startTime, duration, gain, shape) {
 }
 
 function shutdownGracefully() {
-  console.log('Shutting down audio...');
   var start = getCurrentTime(), length = 0.5, progress = 0;
   while (progress <= 1) {
-    masterGain.gain.value = 1 - progress;
+    masterGain.gain.value = (1 - progress) * 0.5;
     progress = (getCurrentTime() - start) / length;
   }
 }
