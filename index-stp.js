@@ -768,12 +768,11 @@ function scheduleDoubleBassNote (note, start, duration, gain) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-var context = new (window.AudioContext || window.webkitAudioContext)();
-reverbjs.extend(context);
+var context;
 var midiQueue;
 var playerStartTime;
 var timeInAdvanceToSchedule = 0.5;
-var predestination = context.destination;
+var predestination;
 var reverbGain;
 var masterGain;
 var reverb;
@@ -834,6 +833,9 @@ function getPieceAsMIDI() {
 }
 
 function initialize () {
+  context = new (window.AudioContext || window.webkitAudioContext)();
+  reverbjs.extend(context);
+  predestination = context.destination;
   configureReverb();
   schedulePiece();
 }
