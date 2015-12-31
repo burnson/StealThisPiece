@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+def verbose(command)
+  puts "--> #{command}"
+  system(command) || fail("Failed: #{command}")
+end
+
+verbose('npm install jslint') if !system('which jslint')
+verbose('./compare_ref_js')
+verbose('jslint --indent 2 index-stp.js')

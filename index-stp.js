@@ -1,4 +1,7 @@
-function setPiece () {
+'use strict';
+var piece, probabilities;
+
+function setPiece() {
   piece = {};
   piece.seed = 133;
   piece.loopContinueRate = 5;
@@ -29,7 +32,7 @@ function setPiece () {
     true, true, true, true,
     true, true, true, true
   ];
-  
+
   probabilities = {};
   probabilities.MoveBackward = 200000;
   probabilities.MoveForward = 200000;
@@ -128,28 +131,27 @@ var globalTime = 0;
 var dynamics = 7;
 var dynamic = [0, 1, 2, 3, 4, 5, 6];
 
-function distributeProbabilities (amount)
-{
+function distributeProbabilities(amount) {
   // Apply probability inversion if being used.
-  probabilities["MoveBackward"] -=
-    piece.computationRateInversion * probabilities["MoveBackward"] * amount;
-  probabilities["MoveForward"] -=
-    piece.computationRateInversion * probabilities["MoveForward"] * amount;
-  probabilities["DecrementData"] -=
-    piece.computationRateInversion * probabilities["DecrementData"] * amount;
-  probabilities["IncrementData"] -=
-    piece.computationRateInversion * probabilities["IncrementData"] * amount;
-    
+  probabilities.MoveBackward -= piece.computationRateInversion * probabilities.MoveBackward * amount;
+  probabilities.MoveForward -= piece.computationRateInversion * probabilities.MoveForward * amount;
+  probabilities.DecrementData -= piece.computationRateInversion * probabilities.DecrementData * amount;
+  probabilities.IncrementData -= piece.computationRateInversion * probabilities.IncrementData * amount;
+
   // Turn the probabilities into a distribution.
   var sum = 0, instruction;
-  for(instruction in probabilities) {
-    sum += probabilities[instruction];
-    probabilities[instruction] = sum;
+  for (instruction in probabilities) {
+    if (probabilities.hasOwnProperty(instruction)) {
+      sum += probabilities[instruction];
+      probabilities[instruction] = sum;
+    }
   }
-  
+
   // Normalize the distribution.
-  for(instruction in probabilities) {
-    probabilities[instruction] /= sum;
+  for (instruction in probabilities) {
+    if (probabilities.hasOwnProperty(instruction)) {
+      probabilities[instruction] /= sum;
+    }
   }
 }
 
@@ -177,23 +179,33 @@ var nameOf = [
   "InstructionCount"
 ];
 
-var indexOf = function () {
+var indexOf = (function () {
   var x = {}, i;
-  for (i = 0; i < nameOf.length; i++) {
-    x[nameOf[i]] = i
+  for (i = 0; i < nameOf.length; i += 1) {
+    x[nameOf[i]] = i;
   }
   return x;
-}();
+}());
 
-function createDurations () {
-  if (piece.rhythmSixteenth) durations.push(durationLCM * 1 / 16);
-  if (piece.rhythmTripletEighth) durations.push(durationLCM * 1 / 12);
-  if (piece.rhythmEighth) durations.push(durationLCM * 1 / 8);
-  if (piece.rhythmTripletQuarter) durations.push(durationLCM * 1 / 6);
-  if (piece.rhythmQuarter) durations.push(durationLCM * 1 / 4);
+function createDurations() {
+  if (piece.rhythmSixteenth) {
+    durations.push(durationLCM / 16);
+  }
+  if (piece.rhythmTripletEighth) {
+    durations.push(durationLCM / 12);
+  }
+  if (piece.rhythmEighth) {
+    durations.push(durationLCM / 8);
+  }
+  if (piece.rhythmTripletQuarter) {
+    durations.push(durationLCM / 6);
+  }
+  if (piece.rhythmQuarter) {
+    durations.push(durationLCM / 4);
+  }
 }
 
-function makeInstrument (index, group, name, low, high) {
+function makeInstrument(index, group, name, low, high) {
   return {
     "index": index,
     "group": group,
@@ -206,7 +218,7 @@ function makeInstrument (index, group, name, low, high) {
   };
 }
 
-function createInstruments () {
+function createInstruments() {
   var i = [];
   i.push(makeInstrument(0,  0, "Flute",       67, 98 + piece.range)); //G4-D6
   i.push(makeInstrument(1,  0, "Oboe",        60, 84 + piece.range)); //C4-C6
@@ -216,8 +228,8 @@ function createInstruments () {
   i.push(makeInstrument(5,  1, "Trumpet",     55, 79 + piece.range)); //G3-G5
   i.push(makeInstrument(6,  1, "Trombone",    43, 67 + piece.range)); //G2-G4
   i.push(makeInstrument(7,  1, "BaritoneSax", 43, 60 + piece.range)); //G2-C4
-  i.push(makeInstrument(8,  2, "Vibraphone",  53, 89              )); //F3-F6
-  i.push(makeInstrument(9,  2, "Crotales",    60, 84              )); //C2-C4
+  i.push(makeInstrument(8,  2, "Vibraphone",  53, 89));               //F3-F6
+  i.push(makeInstrument(9,  2, "Crotales",    60, 84));               //C2-C4
   i.push(makeInstrument(10, 3, "Violin",      55, 84 + piece.range)); //G3-C6
   i.push(makeInstrument(11, 3, "Viola",       48, 79 + piece.range)); //C3-G5
   i.push(makeInstrument(12, 3, "Cello",       36, 67 + piece.range)); //C2-G5
@@ -229,50 +241,52 @@ function createInstruments () {
   instruments[10].group = 2;
 }
 
-function planLoops () {
-  var a = piece.loopInnerStartLow;
-  var b = a + piece.loopInnerStartHigh;
-  var c = b + piece.loopInnerEndLow;
-  var d = c + piece.loopInnerEndHigh;
-  var e = d + piece.loopOuterEndLow;
-  var f = e + piece.loopOuterEndHigh;
-  var g = f + piece.loopStep;
-  var i;
-  var whileBegin = indexOf["WhileBegin"];
-  var whileEnd = indexOf["WhileEnd"];
-  for(i = 0; i < instructions.length - g; i++)
-  {
-    if(random.nextIntBetween(0, piece.loopSkipCreateRate))
-      continue;
-    instructions[i] = whileBegin;
-    instructions[i + random.nextIntBetween(e, f)] = whileEnd;
-    instructions[i + random.nextIntBetween(a, b)] = whileBegin;
-    instructions[i + random.nextIntBetween(c, d)] = whileEnd;
-    i += g;
+function planLoops() {
+  var a = piece.loopInnerStartLow,
+    b = a + piece.loopInnerStartHigh,
+    c = b + piece.loopInnerEndLow,
+    d = c + piece.loopInnerEndHigh,
+    e = d + piece.loopOuterEndLow,
+    f = e + piece.loopOuterEndHigh,
+    g = f + piece.loopStep,
+    i,
+    whileBegin = indexOf.WhileBegin,
+    whileEnd = indexOf.WhileEnd;
+  for (i = 0; i < instructions.length - g; i += 1) {
+    if (random.nextIntBetween(0, piece.loopSkipCreateRate) === 0) {
+      instructions[i] = whileBegin;
+      instructions[i + random.nextIntBetween(e, f)] = whileEnd;
+      instructions[i + random.nextIntBetween(a, b)] = whileBegin;
+      instructions[i + random.nextIntBetween(c, d)] = whileEnd;
+      i += g;
+    }
   }
 }
 
-function getProbableInstruction (normalizedNumber) {
+function getProbableInstruction(normalizedNumber) {
   var k, bestKey = 'NullOp', lowestValue = 2; //i.e. a number > 1
   for (k in probabilities) {
-    if (normalizedNumber < probabilities[k] && probabilities[k] < lowestValue) {
-      lowestValue = probabilities[k];
-      bestKey = k;
+    if (probabilities.hasOwnProperty(k)) {
+      if (normalizedNumber < probabilities[k] &&
+          probabilities[k] < lowestValue) {
+        lowestValue = probabilities[k];
+        bestKey = k;
+      }
     }
   }
   return indexOf[bestKey];
 }
 
-function planInstructions () {
-  var i, n = instructions.length;
-  var inversionProbability;
-  for(i = 0; i < n; i++) {
+function planInstructions() {
+  var i, n = instructions.length, inversionProbability;
+  for (i = 0; i < n; i += 1) {
     setPiece();
     inversionProbability = (Math.floor(i / Math.floor(n /
       piece.probabilityInversionSections)) % 2);
     distributeProbabilities(inversionProbability);
-    if(instructions[i] === 0)
+    if (instructions[i] === 0) {
       instructions[i] = getProbableInstruction(random.nextFloat());
+    }
   }
 }
 
@@ -280,45 +294,45 @@ function halt() {
   return instructionPointer >= instructions.length || instructionPointer < 0;
 }
 
-function getInstruction () {
+function getInstruction() {
   return nameOf[instructions[instructionPointer]];
 }
 
-function getCyclicDataPointer () {
+function getCyclicDataPointer() {
   return (dataPointer + data.length * Math.abs(dataPointer)) % data.length;
 }
 
-function getData () {
+function getData() {
   return data[getCyclicDataPointer()];
 }
 
-function addToData (amount) {
+function addToData(amount) {
   var x = getCyclicDataPointer();
   data[x] = (data[x] + amount + 256) % 256;
 }
 
 function lookupPitch(instrument, p) {
-  var x;
-  var i, noteStart = instrument.low;
+  var x, i, noteStart = instrument.low;
   x = p < 128 ? p : p - 256;
-  
+
   if (instrument.low === instrument.high) {
     return instrument.low;
   }
-  
+
   // Find the first C and make that 0.
-  if (noteStart % 12 != 0) {
+  if (noteStart % 12 !== 0) {
     noteStart += (12 - (instrument.low % 12));
   }
-  
+
   if (x === 0) {
     return noteStart;
   }
-  
+
   if (x > 0) {
-    for (i = 0; i < x; i++) {
-      while (!piece.pitchClass[(++noteStart) % 12]) {}
-      
+    for (i = 0; i < x; i += 1) {
+      noteStart += 1;
+      while (!piece.pitchClass[(noteStart) % 12]) {noteStart += 1;}
+
       //Octave down as far as possible if out of range.
       if (noteStart > instrument.high) {
         while (noteStart - 12 >= instrument.low) {
@@ -327,9 +341,9 @@ function lookupPitch(instrument, p) {
       }
     }
   } else {
-    for (i = 0; i < -x; i++) {
+    for (i = 0; i < -x; i += 1) {
       while (!piece.pitchClass[(--noteStart) % 12]) {}
-      
+
       //Octave up as far as possible if out of range.
       if (noteStart < instrument.low) {
         while (noteStart + 12 <= instrument.high) {
@@ -341,7 +355,7 @@ function lookupPitch(instrument, p) {
   return noteStart;
 }
 
-function makeNote (offset, duration, pitch, dynamicMark) {
+function makeNote(offset, duration, pitch, dynamicMark) {
   var n = {
     "time": offset,
     "duration": duration,
@@ -351,7 +365,7 @@ function makeNote (offset, duration, pitch, dynamicMark) {
   return n;
 }
 
-function addNote (instrument, data) {
+function addNote(instrument, data) {
   var instrumentIsOn = toggles[instrument.group];
   var actualPitch = lookupPitch(instrument, data);
   if (instrument.offset === globalTime) {
@@ -376,7 +390,7 @@ function addNote (instrument, data) {
   }
 }
 
-function emit (i) {
+function emit(i) {
   var index = indexOf[i];
   if (i === 'DecrementDuration') {
     durationIndex = Math.max(0, durationIndex - 1);
@@ -420,7 +434,7 @@ function emit (i) {
   }
 }
 
-function performInstruction () {
+function performInstruction() {
   if (halt()) return false;
   var i = getInstruction();
   if (i === "MoveForward") dataPointer++;
@@ -449,31 +463,31 @@ function performInstruction () {
   return true;
 }
 
-function createPiece () {
+function createPiece() {
   setPiece();
-  
+
   // Initialize random number generator;
   random = createMultiplyWithCarryPRNG(piece.seed);
-  
+
   // Initialize constants and distributions.
   createDurations();
   createInstruments();
   distributeProbabilities(0.0);
-  
+
   // Initialize state and maps.
   var i;
-  for (i = 0; i < piece.codeLength; i++) { instructions[i] = 0; }
-  for (i = 0; i < piece.tapeLength; i++) { data[i] = 0; }
-  
+  for (i = 0; i < piece.codeLength; i += 1) { instructions[i] = 0; }
+  for (i = 0; i < piece.tapeLength; i += 1) { data[i] = 0; }
+
   planLoops();
   planInstructions();
   while (performInstruction()) {}
 }
 
-function pieceAsCSV () {
+function pieceAsCSV() {
   var i, j;
   var pieceString = 'Instrument,Channel,Start,Duration,Key,Dynamic\n';
-  for (i = 0; i < instruments.length; i++) {
+  for (i = 0; i < instruments.length; i += 1) {
     var instrument = instruments[i];
     for (j = 0; j < instrument.notes.length; j++) {
       var note = instrument.notes[j];
@@ -485,18 +499,18 @@ function pieceAsCSV () {
   return pieceString.trim();
 }
 
-function noteTimeToSeconds (noteTime) {
+function noteTimeToSeconds(noteTime) {
   return noteTime * 4 * 60 / piece.tempo / durationLCM;
 }
 
-function dynamicMarkToVelocity (dynamicMark) {
+function dynamicMarkToVelocity(dynamicMark) {
   return Math.round(dynamicMark / 7 * 87) + 20;
 }
 
-function pieceAsMIDI () {
+function pieceAsMIDI() {
   var midiData = [], instrument, note;
   var i, j;
-  for (i = 0; i < instruments.length; i++) {
+  for (i = 0; i < instruments.length; i += 1) {
     instrument = instruments[i];
     for (j = 0; j < instrument.notes.length; j++) {
       note = instrument.notes[j];
@@ -519,79 +533,79 @@ function isRunningUnderNodeJS() {
 
 function parityChecksum(s) {
   var parity = 0, i;
-  for (i = 0; i < s.length; i++) {
+  for (i = 0; i < s.length; i += 1) {
     parity = (parity + s.charCodeAt(i)) >>> 0;
   }
   return parity;
 }
 
-function generateInConsole () {
+function generateInConsole() {
   createPiece();
   var finalPiece = pieceAsCSV();
   console.log('CSV of piece:\n' + finalPiece);
   console.log('Parity of CSV: ' + parityChecksum(finalPiece));
-  if(parityChecksum(finalPiece) !== 6820566) {
+  if (parityChecksum(finalPiece) !== 6820566) {
     console.log('WARNING: piece does not match reference');
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function createMultiplyWithCarryPRNG (seed) {
+function createMultiplyWithCarryPRNG(seed) {
   var state = [];
-  
+
   function get32BitHigh (x) {
     return (x - get32BitLow(x)) / 0x100000000;
   }
-  
+
   function get32BitLow (x) {
     return x >>> 0;
   }
-  
+
   function is32Bit (x) {
     return x >= 0 && x < 0x100000000 && x === Math.floor(x);
   }
-  
+
   function multiply32BitHigh (a, b) {
     return get32BitHigh(get32BitLow(a) * get32BitLow(b));
   }
-  
+
   function multiply32BitLow (a, b) {
     var ah = (get32BitLow(a) >>> 16) & 0xffff, al = get32BitLow(a) & 0xffff;
     var bh = (get32BitLow(b) >>> 16) & 0xffff, bl = get32BitLow(b) & 0xffff;
     return ((al * bl) + ((ah * bl + al * bh) << 16) >>> 0);
   }
-  
+
   var generator = {
     next : function () {
       var magicNumbers = [5115, 1776, 1492, 2111111111], low = 0, high = 0, i;
-      for (i = 0; i < magicNumbers.length; i++) {
+      for (i = 0; i < magicNumbers.length; i += 1) {
         low += multiply32BitLow(state[i], magicNumbers[i]);
         high += multiply32BitHigh(state[i], magicNumbers[i]);
       }
       high += get32BitHigh(low += state.pop()), low = get32BitLow(low);
       return state.unshift(low), state.pop(), state.push(high), state[0];
     },
-    
+
     nextFloat : function () {
       var high = this.next() * 0x100000;
       var low = this.next() >>> 12;
       return (high + low) / Math.pow(2, 52);
     },
-    
+
     nextIntBetween : function(a, b) {
       return Math.floor(a + this.nextFloat() * (b - a));
     },
-    
+
     reseed : function (s) {
       var i;
       if (!is32Bit(s)) {
         console.log(s + " is not a valid seed. Forcing to 0."), s = 0;
       }
-      for (i = 0; i < 5; i++) {
+      for (i = 0; i < 5; i += 1) {
         state.push(s = get32BitLow(multiply32BitLow(29943829, s) + 0xffffffff));
       }
-      for (i = 0; i < 100; i++) {
+      for (i = 0; i < 100; i += 1) {
         this.next();
       }
     }
@@ -602,7 +616,7 @@ function createMultiplyWithCarryPRNG (seed) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function scheduleFluteNote (note, start, duration, gain) {
+function scheduleFluteNote(note, start, duration, gain) {
   gain /= dBToGain(-28);
   scheduleOscillator('sine', note, start, duration, gain,
     [{time:0.3, dB:-32},{time:0.9, dB:-32},{time:1.0, dB:-100}]);
@@ -614,7 +628,7 @@ function scheduleFluteNote (note, start, duration, gain) {
     [{time:0.3, dB:-48},{time:0.9, dB:-48},{time:1.0, dB:-100}]);
 }
 
-function scheduleOboeNote (note, start, duration, gain) {
+function scheduleOboeNote(note, start, duration, gain) {
   gain /= dBToGain(-47);
   scheduleOscillator('sine', note, start, duration, gain,
     [{time:0.1, dB:-50},{time:0.9, dB:-50},{time:1.0, dB:-100}]);
@@ -626,7 +640,7 @@ function scheduleOboeNote (note, start, duration, gain) {
     [{time:0.3, dB:-65},{time:0.9, dB:-65},{time:1.0, dB:-100}]);
 }
 
-function scheduleClarinetNote (note, start, duration, gain) {
+function scheduleClarinetNote(note, start, duration, gain) {
   gain /= dBToGain(-50);
   scheduleOscillator('sine', note, start, duration, gain,
     [{time:0.1, dB:-79},{time:0.9, dB:-79},{time:1.0, dB:-100}]);
@@ -638,7 +652,7 @@ function scheduleClarinetNote (note, start, duration, gain) {
     [{time:0.3, dB:-55},{time:0.9, dB:-55},{time:1.0, dB:-100}]);
 }
 
-function scheduleBassoonNote (note, start, duration, gain) {
+function scheduleBassoonNote(note, start, duration, gain) {
   gain /= dBToGain(-55);
   scheduleOscillator('sine', note, start, duration, gain,
     [{time:0.05, dB:-65},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
@@ -650,7 +664,7 @@ function scheduleBassoonNote (note, start, duration, gain) {
     [{time:0.05, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
 }
 
-function scheduleHornNote (note, start, duration, gain) {
+function scheduleHornNote(note, start, duration, gain) {
   gain /= dBToGain(-55);
   scheduleOscillator('triangle', note, start, duration, gain,
     [{time:0.05, dB:-65},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
@@ -662,7 +676,7 @@ function scheduleHornNote (note, start, duration, gain) {
     [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
 }
 
-function scheduleTromboneNote (note, start, duration, gain) {
+function scheduleTromboneNote(note, start, duration, gain) {
   gain /= dBToGain(-58);
   scheduleOscillator('triangle', note, start, duration, gain,
     [{time:0.05, dB:-65},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
@@ -674,7 +688,7 @@ function scheduleTromboneNote (note, start, duration, gain) {
     [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
 }
 
-function scheduleTrumpetNote (note, start, duration, gain) {
+function scheduleTrumpetNote(note, start, duration, gain) {
   gain /= dBToGain(-50);
   scheduleOscillator('triangle', note, start, duration, gain,
     [{time:0.05, dB:-65},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
@@ -686,7 +700,7 @@ function scheduleTrumpetNote (note, start, duration, gain) {
     [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
 }
 
-function scheduleBaritoneSaxNote (note, start, duration, gain) {
+function scheduleBaritoneSaxNote(note, start, duration, gain) {
   gain /= dBToGain(-50);
   scheduleOscillator('square', note, start, duration, gain,
     [{time:0.05, dB:-62},{time:0.15, dB:-65},{time:0.95, dB:-65},
@@ -702,7 +716,7 @@ function scheduleBaritoneSaxNote (note, start, duration, gain) {
     {time:1.0, dB:-100}]);
 }
 
-function scheduleVibraphoneNote (note, start, duration, gain) {
+function scheduleVibraphoneNote(note, start, duration, gain) {
   gain /= dBToGain(-6);
   scheduleOscillator('triangle', note, start, duration, gain,
     [{time:0.05, dB:-3},{time:0.15, dB:-12},{time:1.0, dB:-100}]);
@@ -714,7 +728,7 @@ function scheduleVibraphoneNote (note, start, duration, gain) {
     [{time:0.05, dB:-24},{time:0.15, dB:-54},{time:1.0, dB:-100}]);
 }
 
-function scheduleCrotalesNote (note, start, duration, gain) {
+function scheduleCrotalesNote(note, start, duration, gain) {
   gain /= dBToGain(-12);
   scheduleOscillator('sine', note, start, duration, gain,
     [{time:0.01, dB:-3},{time:0.05, dB:-30},{time:1.0, dB:-100}]);
@@ -726,7 +740,7 @@ function scheduleCrotalesNote (note, start, duration, gain) {
     [{time:0.01, dB:-24},{time:0.05, dB:-30},{time:1.0, dB:-100}]);
 }
 
-function scheduleViolinNote (note, start, duration, gain) {
+function scheduleViolinNote(note, start, duration, gain) {
   gain /= dBToGain(-55);
   scheduleOscillator('triangle', note, start, duration, gain,
     [{time:0.05, dB:-85},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
@@ -738,7 +752,7 @@ function scheduleViolinNote (note, start, duration, gain) {
     [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
 }
 
-function scheduleViolaNote (note, start, duration, gain) {
+function scheduleViolaNote(note, start, duration, gain) {
   gain /= dBToGain(-50);
   scheduleOscillator('triangle', note, start, duration, gain,
     [{time:0.05, dB:-85},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
@@ -750,7 +764,7 @@ function scheduleViolaNote (note, start, duration, gain) {
     [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
 }
 
-function scheduleCelloNote (note, start, duration, gain) {
+function scheduleCelloNote(note, start, duration, gain) {
   gain /= dBToGain(-50);
   scheduleOscillator('triangle', note - 12, start, duration, gain,
     [{time:0.05, dB:-75},{time:0.95, dB:-55},{time:1.0, dB:-100}]);
@@ -758,7 +772,7 @@ function scheduleCelloNote (note, start, duration, gain) {
     [{time:0.05, dB:-75},{time:0.95, dB:-55},{time:1.0, dB:-100}]);
 }
 
-function scheduleDoubleBassNote (note, start, duration, gain) {
+function scheduleDoubleBassNote(note, start, duration, gain) {
   gain /= dBToGain(-50);
   scheduleOscillator('sawtooth', note - 12, start, duration, gain,
     [{time:0.05, dB:-75},{time:0.95, dB:-55},{time:1.0, dB:-100}]);
@@ -777,7 +791,7 @@ var reverbGain;
 var masterGain;
 var reverb;
 
-function configureReverb () {
+function configureReverb() {
   masterGain = context.createGain();
   masterGain.gain.value = 0.5;
   masterGain.connect(context.destination);
@@ -785,7 +799,7 @@ function configureReverb () {
   reverbGain = context.createGain();
   reverbGain.gain.value = 1.0;
   reverbGain.connect(masterGain);
-  
+
   predestination = reverbGain;
 
   reverb = context.createReverbFromUrl(
@@ -802,7 +816,7 @@ function dBToGain(dB) {
   return Math.pow(10, dB / 10);
 }
 
-function frequencyToMIDINoteNumber (frequency) {
+function frequencyToMIDINoteNumber(frequency) {
   var n = 12 * Math.log(frequency * Math.pow(2, 11 / 4) / 55) / Math.log(2);
   var rounded = Math.round(n * 128) / 128;
   return rounded;
@@ -832,7 +846,7 @@ function getPieceAsMIDI() {
   return exampleData;
 }
 
-function initialize () {
+function initialize() {
   context = new (window.AudioContext || window.webkitAudioContext)();
   reverbjs.extend(context);
   predestination = context.destination;
@@ -840,11 +854,11 @@ function initialize () {
   schedulePiece();
 }
 
-function midiNoteNumberToFrequency (midiNoteNumber) {
+function midiNoteNumberToFrequency(midiNoteNumber) {
   return 55 * Math.pow(2, (midiNoteNumber - 33) / 12);
 }
 
-function processNextFrame () {
+function processNextFrame() {
   if (midiQueue.length === 0) {
     return;
   }
@@ -858,7 +872,7 @@ function processNextFrame () {
   window.requestAnimationFrame(processNextFrame);
 }
 
-function scheduleInstrumentalNote (instrument, midiNoteNumber, startTime,
+function scheduleInstrumentalNote(instrument, midiNoteNumber, startTime,
   duration, velocity) {
   if (velocity === undefined) {
     velocity = 0.5;
@@ -885,7 +899,7 @@ function scheduleInstrumentalNote (instrument, midiNoteNumber, startTime,
   instruments[instrument](midiNoteNumber, startTime, duration, gain);
 }
 
-function schedulePiece () {
+function schedulePiece() {
   scheduleInstrumentalNote(0, 60, 0, 0, 0); //just to get things going
   midiQueue = getPieceAsMIDI();
   playerStartTime = getCurrentTime() + 1.0;
@@ -906,7 +920,7 @@ function scheduleOscillator(type, note, startTime, duration, gain, shape) {
     gainShaper.gain.linearRampToValueAtTime(g, t);
   }
   gainShaper.connect(predestination);
-  
+
   var oscillator = context.createOscillator();
   oscillator.type = type;
   oscillator.frequency.value = midiNoteNumberToFrequency(note);
