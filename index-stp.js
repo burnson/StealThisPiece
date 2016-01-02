@@ -331,7 +331,7 @@ function lookupPitch(instrument, p) {
   if (x > 0) {
     for (i = 0; i < x; i += 1) {
       noteStart += 1;
-      while (!piece.pitchClass[(noteStart) % 12]) {noteStart += 1;}
+      while (!piece.pitchClass[noteStart % 12]) { noteStart += 1; }
 
       //Octave down as far as possible if out of range.
       if (noteStart > instrument.high) {
@@ -342,7 +342,8 @@ function lookupPitch(instrument, p) {
     }
   } else {
     for (i = 0; i < -x; i += 1) {
-      while (!piece.pitchClass[(--noteStart) % 12]) {}
+      noteStart -= 1;
+      while (!piece.pitchClass[noteStart % 12]) { noteStart -= 1; }
 
       //Octave up as far as possible if out of range.
       if (noteStart < instrument.low) {
@@ -366,10 +367,12 @@ function makeNote(offset, duration, pitch, dynamicMark) {
 }
 
 function addNote(instrument, data) {
-  var instrumentIsOn = toggles[instrument.group];
-  var actualPitch = lookupPitch(instrument, data);
+  var instrumentIsOn = toggles[instrument.group],
+    actualPitch = lookupPitch(instrument, data),
+    duration,
+    longestNote;
   if (instrument.offset === globalTime) {
-    var duration = durations[durationIndex];
+    duration = durations[durationIndex];
     if (instrumentIsOn) {
       instrument.notes.push(makeNote(instrument.offset, duration,
         actualPitch, dynamic[instrument.dynamicMark]));
@@ -377,11 +380,11 @@ function addNote(instrument, data) {
     instrument.offset += duration;
     globalTime = instrument.offset;
   } else if (instrument.offset < globalTime) {
-    var longestNote = piece.longestNote * durationLCM / 4;
+    longestNote = piece.longestNote * durationLCM / 4;
     if (globalTime - instrument.offset > longestNote) {
       instrument.offset = globalTime - longestNote;
     }
-    var duration = globalTime - instrument.offset;
+    duration = globalTime - instrument.offset;
     if (instrumentIsOn) {
       instrument.notes.push(makeNote(instrument.offset, duration,
         actualPitch, dynamic[instrument.dynamicMark]));
@@ -391,28 +394,28 @@ function addNote(instrument, data) {
 }
 
 function emit(i) {
-  var index = indexOf[i];
+  var index = indexOf[i], instrumentId, indexToToggle,
+    dynamicId, dynamicType, dynamicInstrument, dynamicMark;
   if (i === 'DecrementDuration') {
     durationIndex = Math.max(0, durationIndex - 1);
   } else if (i === 'IncrementDuration') {
     durationIndex = Math.min(durations.length - 1, durationIndex + 1);
   } else if (index >= indexOf.EmitFlute &&
              index <= indexOf.EmitDoubleBass) {
-    var instrumentId = index - indexOf['EmitFlute'];
-    var d = getData();
+    instrumentId = index - indexOf.EmitFlute;
     addNote(instruments[instrumentId], getData());
   } else if (index >= indexOf.ToggleWinds &&
              index <= indexOf.ToggleStrings) {
-    var indexToToggle = index - indexOf.ToggleWinds;
+    indexToToggle = index - indexOf.ToggleWinds;
     toggles[indexToToggle] = !toggles[indexToToggle];
     if (!toggles[0] && !toggles[1] && !toggles[2] && !toggles[3]) {
       toggles = [true, true, true, true];
     }
   } else if (index >= indexOf.FluteSoft && index <= indexOf.DoubleBassLouder) {
-    var dynamicId = index - indexOf.FluteSoft;
-    var dynamicType = dynamicId % 4;
-    var dynamicInstrument = (dynamicId - dynamicType) / 4;
-    var dynamicMark = instruments[dynamicInstrument].dynamicMark;
+    dynamicId = index - indexOf.FluteSoft;
+    dynamicType = dynamicId % 4;
+    dynamicInstrument = (dynamicId - dynamicType) / 4;
+    dynamicMark = instruments[dynamicInstrument].dynamicMark;
     if (dynamicType === 0) {
       dynamicMark = 2;
     } else if (dynamicType === 1) {
@@ -435,32 +438,107 @@ function emit(i) {
 }
 
 function performInstruction() {
-  if (halt()) return false;
-  var i = getInstruction();
-  if (i === "MoveForward") dataPointer++;
-  else if (i === "MoveBackward") dataPointer--;
-  else if (i === "IncrementData") addToData(1);
-  else if (i === "DecrementData") addToData(-1);
-  else if ((i === "WhileBegin" && !getData()) || (i === "WhileEnd" && getData())) {
+  if (halt()) {
+    return false;
+  }
+  var i = getInstruction(), braceCount;
+  if (i === "MoveForward") {
+    dataPointer += 1;
+  } else if (i === "MoveBackward") {
+    dataPointer -= 1;
+  } else if (i === "IncrementData") {
+    addToData(1);
+  } else if (i === "DecrementData") {
+    addToData(-1);
+  } else if ((i === "WhileBegin" && !getData()) || (i === "WhileEnd" && getData())) {
     if (i !== "WhileEnd" || random.nextIntBetween(0, piece.loopContinueRate)) {
       //Perform jump operation to emulate while loops.
-      var braceCount = 1;
+      braceCount = 1;
       do {
-        instructionPointer += (i == "WhileBegin" ? 1 : -1);
+        instructionPointer += (i === "WhileBegin" ? 1 : -1);
         if (halt()) {
           return false;
         }
-        if (getInstruction() === (i === "WhileBegin" ? "WhileEnd" : "WhileBegin"))
-          braceCount--;
-        else if (getInstruction() === (i === "WhileEnd" ? "WhileEnd" : "WhileBegin"))
-          braceCount++;
+        if (getInstruction() === (i === "WhileBegin" ? "WhileEnd" : "WhileBegin")) {
+          braceCount -= 1;
+        } else if (getInstruction() === (i === "WhileEnd" ? "WhileEnd" : "WhileBegin")) {
+          braceCount += 1;
+        }
       } while (braceCount > 0);
     }
   } else {
     emit(i);
   }
-  instructionPointer++;
+  instructionPointer += 1;
   return true;
+}
+
+function createMultiplyWithCarryPRNG(seed) {
+  function get32BitLow(x) {
+    return x >>> 0;
+  }
+
+  function get32BitHigh(x) {
+    return (x - get32BitLow(x)) / 0x100000000;
+  }
+
+  function is32Bit(x) {
+    return x >= 0 && x < 0x100000000 && x === Math.floor(x);
+  }
+
+  function multiply32BitHigh(a, b) {
+    return get32BitHigh(get32BitLow(a) * get32BitLow(b));
+  }
+
+  function multiply32BitLow(a, b) {
+    var ah = (get32BitLow(a) >>> 16) & 0xffff, al = get32BitLow(a) & 0xffff,
+      bh = (get32BitLow(b) >>> 16) & 0xffff, bl = get32BitLow(b) & 0xffff;
+    return ((al * bl) + ((ah * bl + al * bh) << 16) >>> 0);
+  }
+
+  var state = [], generator = {
+    next : function () {
+      var magicNumbers = [5115, 1776, 1492, 2111111111], low = 0, high = 0, i;
+      for (i = 0; i < magicNumbers.length; i += 1) {
+        low += multiply32BitLow(state[i], magicNumbers[i]);
+        high += multiply32BitHigh(state[i], magicNumbers[i]);
+      }
+      low += state.pop();
+      high += get32BitHigh(low);
+      low = get32BitLow(low);
+      state.unshift(low);
+      state.pop();
+      state.push(high);
+      return state[0];
+    },
+
+    nextFloat : function () {
+      var high = this.next() * 0x100000,
+        low = this.next() >>> 12;
+      return (high + low) / Math.pow(2, 52);
+    },
+
+    nextIntBetween : function (a, b) {
+      return Math.floor(a + this.nextFloat() * (b - a));
+    },
+
+    reseed : function (s) {
+      var i;
+      if (!is32Bit(s)) {
+        console.log(s + " is not a valid seed. Forcing to 0.");
+        s = 0;
+      }
+      for (i = 0; i < 5; i += 1) {
+        s = get32BitLow(multiply32BitLow(29943829, s) + 0xffffffff);
+        state.push(s);
+      }
+      for (i = 0; i < 100; i += 1) {
+        this.next();
+      }
+    }
+  };
+  generator.reseed(seed);
+  return generator;
 }
 
 function createPiece() {
@@ -475,25 +553,27 @@ function createPiece() {
   distributeProbabilities(0.0);
 
   // Initialize state and maps.
-  var i;
+  var i, shouldContinue = true;
   for (i = 0; i < piece.codeLength; i += 1) { instructions[i] = 0; }
   for (i = 0; i < piece.tapeLength; i += 1) { data[i] = 0; }
 
   planLoops();
   planInstructions();
-  while (performInstruction()) {}
+  while (shouldContinue) {
+    shouldContinue = performInstruction();
+  }
 }
 
 function pieceAsCSV() {
-  var i, j;
-  var pieceString = 'Instrument,Channel,Start,Duration,Key,Dynamic\n';
+  var i, j, pieceString = 'Instrument,Channel,Start,Duration,Key,Dynamic\n',
+    instrument, note;
   for (i = 0; i < instruments.length; i += 1) {
-    var instrument = instruments[i];
-    for (j = 0; j < instrument.notes.length; j++) {
-      var note = instrument.notes[j];
+    instrument = instruments[i];
+    for (j = 0; j < instrument.notes.length; j += 1) {
+      note = instrument.notes[j];
       pieceString += instrument.name + ',' + instrument.index + ',' +
         note.time + ',' + note.duration + ',' + note.pitch + ',' +
-        note.dynamicMark + '\n'
+        note.dynamicMark + '\n';
     }
   }
   return pieceString.trim();
@@ -508,11 +588,10 @@ function dynamicMarkToVelocity(dynamicMark) {
 }
 
 function pieceAsMIDI() {
-  var midiData = [], instrument, note;
-  var i, j;
+  var midiData = [], instrument, note, i, j;
   for (i = 0; i < instruments.length; i += 1) {
     instrument = instruments[i];
-    for (j = 0; j < instrument.notes.length; j++) {
+    for (j = 0; j < instrument.notes.length; j += 1) {
       note = instrument.notes[j];
       midiData.push({
         "time": noteTimeToSeconds(note.time),
@@ -527,7 +606,7 @@ function pieceAsMIDI() {
 }
 
 function isRunningUnderNodeJS() {
-  return typeof global !== 'undefined' &&
+  return global !== undefined &&
     Object.prototype.toString.call(global.process) === '[object process]';
 }
 
@@ -549,69 +628,53 @@ function generateInConsole() {
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-function createMultiplyWithCarryPRNG(seed) {
-  var state = [];
-
-  function get32BitHigh (x) {
-    return (x - get32BitLow(x)) / 0x100000000;
+function dBToGain(dB) {
+  if (dB <= -100) {
+    return 0;
   }
+  return Math.pow(10, dB / 10);
+}
 
-  function get32BitLow (x) {
-    return x >>> 0;
+var context;
+var midiQueue;
+var playerStartTime;
+var timeInAdvanceToSchedule = 0.5;
+var predestination;
+var reverbGain;
+var masterGain;
+var reverb;
+
+function getCurrentTime() {
+  return context.currentTime;
+}
+
+function midiNoteNumberToFrequency(midiNoteNumber) {
+  return 55 * Math.pow(2, (midiNoteNumber - 33) / 12);
+}
+
+function scheduleOscillator(type, note, startTime, duration, gain, shape) {
+  if (startTime < getCurrentTime()) {
+    console.log('Warning: dropped note that started in past');
+    return;
   }
-
-  function is32Bit (x) {
-    return x >= 0 && x < 0x100000000 && x === Math.floor(x);
-  }
-
-  function multiply32BitHigh (a, b) {
-    return get32BitHigh(get32BitLow(a) * get32BitLow(b));
-  }
-
-  function multiply32BitLow (a, b) {
-    var ah = (get32BitLow(a) >>> 16) & 0xffff, al = get32BitLow(a) & 0xffff;
-    var bh = (get32BitLow(b) >>> 16) & 0xffff, bl = get32BitLow(b) & 0xffff;
-    return ((al * bl) + ((ah * bl + al * bh) << 16) >>> 0);
-  }
-
-  var generator = {
-    next : function () {
-      var magicNumbers = [5115, 1776, 1492, 2111111111], low = 0, high = 0, i;
-      for (i = 0; i < magicNumbers.length; i += 1) {
-        low += multiply32BitLow(state[i], magicNumbers[i]);
-        high += multiply32BitHigh(state[i], magicNumbers[i]);
-      }
-      high += get32BitHigh(low += state.pop()), low = get32BitLow(low);
-      return state.unshift(low), state.pop(), state.push(high), state[0];
-    },
-
-    nextFloat : function () {
-      var high = this.next() * 0x100000;
-      var low = this.next() >>> 12;
-      return (high + low) / Math.pow(2, 52);
-    },
-
-    nextIntBetween : function(a, b) {
-      return Math.floor(a + this.nextFloat() * (b - a));
-    },
-
-    reseed : function (s) {
-      var i;
-      if (!is32Bit(s)) {
-        console.log(s + " is not a valid seed. Forcing to 0."), s = 0;
-      }
-      for (i = 0; i < 5; i += 1) {
-        state.push(s = get32BitLow(multiply32BitLow(29943829, s) + 0xffffffff));
-      }
-      for (i = 0; i < 100; i += 1) {
-        this.next();
-      }
+  var gainShaper = context.createGain(), i, g, t, oscillator;
+  gainShaper.gain.value = 0;
+  gainShaper.gain.setValueAtTime(0, startTime);
+  for (i in shape) {
+    if (shape.hasOwnProperty(i)) {
+      g = dBToGain(shape[i].dB) * gain;
+      t = startTime + shape[i].time * duration;
+      gainShaper.gain.linearRampToValueAtTime(g, t);
     }
-  };
-  generator.reseed(seed);
-  return generator;
+  }
+  gainShaper.connect(predestination);
+
+  oscillator = context.createOscillator();
+  oscillator.type = type;
+  oscillator.frequency.value = midiNoteNumberToFrequency(note);
+  oscillator.start(startTime);
+  oscillator.stop(startTime + duration);
+  oscillator.connect(gainShaper);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -782,15 +845,6 @@ function scheduleDoubleBassNote(note, start, duration, gain) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-var context;
-var midiQueue;
-var playerStartTime;
-var timeInAdvanceToSchedule = 0.5;
-var predestination;
-var reverbGain;
-var masterGain;
-var reverb;
-
 function configureReverb() {
   masterGain = context.createGain();
   masterGain.gain.value = 0.5;
@@ -809,21 +863,10 @@ function configureReverb() {
   reverb.connect(masterGain);
 }
 
-function dBToGain(dB) {
-  if (dB <= -100) {
-    return 0;
-  }
-  return Math.pow(10, dB / 10);
-}
-
 function frequencyToMIDINoteNumber(frequency) {
   var n = 12 * Math.log(frequency * Math.pow(2, 11 / 4) / 55) / Math.log(2);
   var rounded = Math.round(n * 128) / 128;
   return rounded;
-}
-
-function getCurrentTime() {
-  return context.currentTime;
 }
 
 function getPieceAsMIDI() {
@@ -852,10 +895,6 @@ function initialize() {
   predestination = context.destination;
   configureReverb();
   schedulePiece();
-}
-
-function midiNoteNumberToFrequency(midiNoteNumber) {
-  return 55 * Math.pow(2, (midiNoteNumber - 33) / 12);
 }
 
 function processNextFrame() {
@@ -904,29 +943,6 @@ function schedulePiece() {
   midiQueue = getPieceAsMIDI();
   playerStartTime = getCurrentTime() + 1.0;
   processNextFrame();
-}
-
-function scheduleOscillator(type, note, startTime, duration, gain, shape) {
-  if (startTime < getCurrentTime()) {
-    console.log('Warning: dropped note that started in past');
-    return;
-  }
-  var gainShaper = context.createGain();
-  gainShaper.gain.value = 0;
-  gainShaper.gain.setValueAtTime(0, startTime);
-  for (var i in shape) {
-    var g = dBToGain(shape[i].dB) * gain;
-    var t = startTime + shape[i].time * duration;
-    gainShaper.gain.linearRampToValueAtTime(g, t);
-  }
-  gainShaper.connect(predestination);
-
-  var oscillator = context.createOscillator();
-  oscillator.type = type;
-  oscillator.frequency.value = midiNoteNumberToFrequency(note);
-  oscillator.start(startTime);
-  oscillator.stop(startTime + duration);
-  oscillator.connect(gainShaper);
 }
 
 function shutdownGracefully() {
