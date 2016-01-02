@@ -119,509 +119,514 @@ function pieceConfiguration() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-var piece = {}, probabilities = {}, distribution = {}, random;
-var durationIndex = 0;
-var durations = [];
-var durationLCM = 48;
-var instruments = [];
-var toggles = [true, true, true, true];
-var instructions = [], data = [];
-var instructionPointer = 0;
-var dataPointer = 0;
-var globalTime = 0;
-var dynamics = 7;
-var dynamic = [0, 1, 2, 3, 4, 5, 6];
+var PieceGenerator = function PieceGenerator(configuration) {
+  this.data = [];
+  this.dataPointer = 0;
+  this.distribution = {};
+  this.durationIndex = 0;
+  this.durationLCM = 48;
+  this.durations = [];
+  this.dynamic = [0, 1, 2, 3, 4, 5, 6];
+  this.dynamics = 7;
+  this.globalTime = 0;
+  this.instructionPointer = 0;
+  this.instructions = [];
+  this.instruments = [];
+  this.piece = configuration;
+  this.probabilities = configuration.probabilityOf;
+  this.random = null;
+  this.toggles = [true, true, true, true];
 
-var instructionSet = [
-  "NullOp", "WhileBegin", "WhileEnd", "MoveBackward", "MoveForward",
-  "DecrementData", "IncrementData", "DecrementDuration", "IncrementDuration",
-  "EmitFlute", "EmitOboe", "EmitClarinet", "EmitBassoon", "EmitHorn",
-  "EmitTrumpet", "EmitTrombone", "EmitBaritoneSax", "EmitVibraphone",
-  "EmitCrotales", "EmitViolin", "EmitViola", "EmitCello", "EmitDoubleBass",
-  "ToggleWinds", "ToggleBrass", "TogglePercussion", "ToggleStrings",
-  "FluteSoft", "FluteLoud", "FluteSofter", "FluteLouder", "OboeSoft",
-  "OboeLoud", "OboeSofter", "OboeLouder", "ClarinetSoft", "ClarinetLoud",
-  "ClarinetSofter", "ClarinetLouder", "BassoonSoft", "BassoonLoud",
-  "BassoonSofter", "BassoonLouder", "HornSoft", "HornLoud", "HornSofter",
-  "HornLouder", "TrumpetSoft", "TrumpetLoud", "TrumpetSofter", "TrumpetLouder",
-  "TromboneSoft", "TromboneLoud", "TromboneSofter", "TromboneLouder",
-  "BaritoneSaxSoft", "BaritoneSaxLoud", "BaritoneSaxSofter",
-  "BaritoneSaxLouder", "VibraphoneSoft", "VibraphoneLoud",
-  "VibraphoneSofter", "VibraphoneLouder", "CrotalesSoft", "CrotalesLoud",
-  "CrotalesSofter", "CrotalesLouder", "ViolinSoft", "ViolinLoud",
-  "ViolinSofter", "ViolinLouder", "ViolaSoft", "ViolaLoud", "ViolaSofter",
-  "ViolaLouder", "CelloSoft", "CelloLoud", "CelloSofter", "CelloLouder",
-  "DoubleBassSoft", "DoubleBassLoud", "DoubleBassSofter", "DoubleBassLouder",
-  "InstructionCount"
-];
+  this.instructionSet = [
+    "NullOp", "WhileBegin", "WhileEnd", "MoveBackward", "MoveForward",
+    "DecrementData", "IncrementData", "DecrementDuration", "IncrementDuration",
+    "EmitFlute", "EmitOboe", "EmitClarinet", "EmitBassoon", "EmitHorn",
+    "EmitTrumpet", "EmitTrombone", "EmitBaritoneSax", "EmitVibraphone",
+    "EmitCrotales", "EmitViolin", "EmitViola", "EmitCello", "EmitDoubleBass",
+    "ToggleWinds", "ToggleBrass", "TogglePercussion", "ToggleStrings",
+    "FluteSoft", "FluteLoud", "FluteSofter", "FluteLouder", "OboeSoft",
+    "OboeLoud", "OboeSofter", "OboeLouder", "ClarinetSoft", "ClarinetLoud",
+    "ClarinetSofter", "ClarinetLouder", "BassoonSoft", "BassoonLoud",
+    "BassoonSofter", "BassoonLouder", "HornSoft", "HornLoud", "HornSofter",
+    "HornLouder", "TrumpetSoft", "TrumpetLoud", "TrumpetSofter",
+    "TrumpetLouder", "TromboneSoft", "TromboneLoud", "TromboneSofter",
+    "TromboneLouder", "BaritoneSaxSoft", "BaritoneSaxLoud", "BaritoneSaxSofter",
+    "BaritoneSaxLouder", "VibraphoneSoft", "VibraphoneLoud",
+    "VibraphoneSofter", "VibraphoneLouder", "CrotalesSoft", "CrotalesLoud",
+    "CrotalesSofter", "CrotalesLouder", "ViolinSoft", "ViolinLoud",
+    "ViolinSofter", "ViolinLouder", "ViolaSoft", "ViolaLoud", "ViolaSofter",
+    "ViolaLouder", "CelloSoft", "CelloLoud", "CelloSofter", "CelloLouder",
+    "DoubleBassSoft", "DoubleBassLoud", "DoubleBassSofter", "DoubleBassLouder",
+    "InstructionCount"
+  ];
 
-var indexOf = (function () {
-  var x = {}, i;
-  for (i = 0; i < instructionSet.length; i += 1) {
-    x[instructionSet[i]] = i;
-  }
-  return x;
-}());
-
-function distributeProbabilities(inversionProbability) {
-  var inversionAmount = piece.computationRateInversion * inversionProbability,
-    sum = 0,
-    instruction;
-  distribution = {};
-  for (instruction in probabilities) {
-    if (probabilities.hasOwnProperty(instruction)) {
-      distribution[instruction] = probabilities[instruction];
+  this.indexOf = (function (that) {
+    var x = {}, i;
+    for (i = 0; i < that.instructionSet.length; i += 1) {
+      x[that.instructionSet[i]] = i;
     }
-  }
+    return x;
+  }(this));
 
-  // Apply probability inversion if being used.
-  distribution.MoveBackward -= inversionAmount * distribution.MoveBackward;
-  distribution.MoveForward -= inversionAmount * distribution.MoveForward;
-  distribution.DecrementData -= inversionAmount * distribution.DecrementData;
-  distribution.IncrementData -= inversionAmount * distribution.IncrementData;
-
-  // Turn the probabilities into a distribution.
-  for (instruction in distribution) {
-    if (distribution.hasOwnProperty(instruction)) {
-      sum += distribution[instruction];
-      distribution[instruction] = sum;
-    }
-  }
-
-  // Normalize the distribution.
-  for (instruction in distribution) {
-    if (distribution.hasOwnProperty(instruction)) {
-      distribution[instruction] /= sum;
-    }
-  }
-}
-
-function createDurations() {
-  if (piece.rhythmSixteenth) {
-    durations.push(durationLCM / 16);
-  }
-  if (piece.rhythmTripletEighth) {
-    durations.push(durationLCM / 12);
-  }
-  if (piece.rhythmEighth) {
-    durations.push(durationLCM / 8);
-  }
-  if (piece.rhythmTripletQuarter) {
-    durations.push(durationLCM / 6);
-  }
-  if (piece.rhythmQuarter) {
-    durations.push(durationLCM / 4);
-  }
-}
-
-function makeInstrument(index, group, name, low, high) {
-  return {
-    "index": index,
-    "group": group,
-    "name": name,
-    "low": low,
-    "high": high,
-    "notes": [],
-    "offset": 0,
-    "dynamicMark": 3
-  };
-}
-
-function createInstruments() {
-  var i = [];
-  i.push(makeInstrument(0,  0, "Flute",       67, 98 + piece.range)); //G4-D6
-  i.push(makeInstrument(1,  0, "Oboe",        60, 84 + piece.range)); //C4-C6
-  i.push(makeInstrument(2,  0, "Clarinet",    50, 79 + piece.range)); //D3-G5
-  i.push(makeInstrument(3,  0, "Bassoon",     36, 67 + piece.range)); //C2-G4
-  i.push(makeInstrument(4,  1, "Horn",        48, 72 + piece.range)); //C3-C5
-  i.push(makeInstrument(5,  1, "Trumpet",     55, 79 + piece.range)); //G3-G5
-  i.push(makeInstrument(6,  1, "Trombone",    43, 67 + piece.range)); //G2-G4
-  i.push(makeInstrument(7,  1, "BaritoneSax", 43, 60 + piece.range)); //G2-C4
-  i.push(makeInstrument(8,  2, "Vibraphone",  53, 89));               //F3-F6
-  i.push(makeInstrument(9,  2, "Crotales",    60, 84));               //C2-C4
-  i.push(makeInstrument(10, 3, "Violin",      55, 84 + piece.range)); //G3-C6
-  i.push(makeInstrument(11, 3, "Viola",       48, 79 + piece.range)); //C3-G5
-  i.push(makeInstrument(12, 3, "Cello",       36, 67 + piece.range)); //C2-G5
-  i.push(makeInstrument(13, 3, "DoubleBass",  28, 48 + piece.range)); //E2-C4
-  instruments = i;
-
-  /*Backwards compatibility to express original behavior where Violin was
-  considered part of the percussion group for toggling. This could be removed.*/
-  instruments[10].group = 2;
-}
-
-function planLoops() {
-  var a = piece.loopInnerStartLow,
-    b = a + piece.loopInnerStartHigh,
-    c = b + piece.loopInnerEndLow,
-    d = c + piece.loopInnerEndHigh,
-    e = d + piece.loopOuterEndLow,
-    f = e + piece.loopOuterEndHigh,
-    g = f + piece.loopStep,
-    i,
-    whileBegin = indexOf.WhileBegin,
-    whileEnd = indexOf.WhileEnd;
-  for (i = 0; i < instructions.length - g; i += 1) {
-    if (random.nextIntBetween(0, piece.loopSkipCreateRate) === 0) {
-      instructions[i] = whileBegin;
-      instructions[i + random.nextIntBetween(e, f)] = whileEnd;
-      instructions[i + random.nextIntBetween(a, b)] = whileBegin;
-      instructions[i + random.nextIntBetween(c, d)] = whileEnd;
-      i += g;
-    }
-  }
-}
-
-function getProbableInstruction(normalizedNumber) {
-  var k, bestKey = 'NullOp', lowestValue = 2; //i.e. a number > 1
-  for (k in distribution) {
-    if (distribution.hasOwnProperty(k)) {
-      if (normalizedNumber < distribution[k] &&
-          distribution[k] < lowestValue) {
-        lowestValue = distribution[k];
-        bestKey = k;
+  this.distributeProbabilities = function (inversionProbability) {
+    var inversionAmount = this.piece.computationRateInversion * inversionProbability,
+      sum = 0,
+      instruction;
+    this.distribution = {};
+    for (instruction in this.probabilities) {
+      if (this.probabilities.hasOwnProperty(instruction)) {
+        this.distribution[instruction] = this.probabilities[instruction];
       }
     }
-  }
-  return indexOf[bestKey];
-}
 
-function planInstructions() {
-  var i, n = instructions.length, inversionProbability;
-  for (i = 0; i < n; i += 1) {
-    inversionProbability = (Math.floor(i / Math.floor(n /
-      piece.probabilityInversionSections)) % 2);
-    distributeProbabilities(inversionProbability);
-    if (instructions[i] === 0) {
-      instructions[i] = getProbableInstruction(random.nextFloat());
+    // Apply probability inversion if being used.
+    this.distribution.MoveBackward -= inversionAmount * this.distribution.MoveBackward;
+    this.distribution.MoveForward -= inversionAmount * this.distribution.MoveForward;
+    this.distribution.DecrementData -= inversionAmount * this.distribution.DecrementData;
+    this.distribution.IncrementData -= inversionAmount * this.distribution.IncrementData;
+
+    // Distribute the probabilities.
+    for (instruction in this.distribution) {
+      if (this.distribution.hasOwnProperty(instruction)) {
+        sum += this.distribution[instruction];
+        this.distribution[instruction] = sum;
+      }
     }
-  }
-}
 
-function halt() {
-  return instructionPointer >= instructions.length || instructionPointer < 0;
-}
+    // Normalize the distribution.
+    for (instruction in this.distribution) {
+      if (this.distribution.hasOwnProperty(instruction)) {
+        this.distribution[instruction] /= sum;
+      }
+    }
+  };
 
-function getInstruction() {
-  return instructionSet[instructions[instructionPointer]];
-}
+  this.createDurations = function () {
+    if (this.piece.rhythmSixteenth) {
+      this.durations.push(this.durationLCM / 16);
+    }
+    if (this.piece.rhythmTripletEighth) {
+      this.durations.push(this.durationLCM / 12);
+    }
+    if (this.piece.rhythmEighth) {
+      this.durations.push(this.durationLCM / 8);
+    }
+    if (this.piece.rhythmTripletQuarter) {
+      this.durations.push(this.durationLCM / 6);
+    }
+    if (this.piece.rhythmQuarter) {
+      this.durations.push(this.durationLCM / 4);
+    }
+  };
 
-function getCyclicDataPointer() {
-  return (dataPointer + data.length * Math.abs(dataPointer)) % data.length;
-}
+  this.makeInstrument = function (index, group, name, low, high) {
+    return {
+      "index": index,
+      "group": group,
+      "name": name,
+      "low": low,
+      "high": high,
+      "notes": [],
+      "offset": 0,
+      "dynamicMark": 3
+    };
+  };
 
-function getData() {
-  return data[getCyclicDataPointer()];
-}
+  this.createInstruments = function () {
+    var i = [];
+    i.push(this.makeInstrument(0,  0, "Flute",       67, 98 + this.piece.range)); //G4-D6
+    i.push(this.makeInstrument(1,  0, "Oboe",        60, 84 + this.piece.range)); //C4-C6
+    i.push(this.makeInstrument(2,  0, "Clarinet",    50, 79 + this.piece.range)); //D3-G5
+    i.push(this.makeInstrument(3,  0, "Bassoon",     36, 67 + this.piece.range)); //C2-G4
+    i.push(this.makeInstrument(4,  1, "Horn",        48, 72 + this.piece.range)); //C3-C5
+    i.push(this.makeInstrument(5,  1, "Trumpet",     55, 79 + this.piece.range)); //G3-G5
+    i.push(this.makeInstrument(6,  1, "Trombone",    43, 67 + this.piece.range)); //G2-G4
+    i.push(this.makeInstrument(7,  1, "BaritoneSax", 43, 60 + this.piece.range)); //G2-C4
+    i.push(this.makeInstrument(8,  2, "Vibraphone",  53, 89));               //F3-F6
+    i.push(this.makeInstrument(9,  2, "Crotales",    60, 84));               //C2-C4
+    i.push(this.makeInstrument(10, 3, "Violin",      55, 84 + this.piece.range)); //G3-C6
+    i.push(this.makeInstrument(11, 3, "Viola",       48, 79 + this.piece.range)); //C3-G5
+    i.push(this.makeInstrument(12, 3, "Cello",       36, 67 + this.piece.range)); //C2-G5
+    i.push(this.makeInstrument(13, 3, "DoubleBass",  28, 48 + this.piece.range)); //E2-C4
+    this.instruments = i;
 
-function addToData(amount) {
-  var x = getCyclicDataPointer();
-  data[x] = (data[x] + amount + 256) % 256;
-}
+    /*Backwards compatibility to express original behavior where Violin was
+    considered part of the percussion group for toggling. This could be removed.*/
+    this.instruments[10].group = 2;
+  };
 
-function lookupPitch(instrument, p) {
-  var x, i, noteStart = instrument.low;
-  x = p < 128 ? p : p - 256;
+  this.planLoops = function () {
+    var a = this.piece.loopInnerStartLow,
+      b = a + this.piece.loopInnerStartHigh,
+      c = b + this.piece.loopInnerEndLow,
+      d = c + this.piece.loopInnerEndHigh,
+      e = d + this.piece.loopOuterEndLow,
+      f = e + this.piece.loopOuterEndHigh,
+      g = f + this.piece.loopStep,
+      i,
+      whileBegin = this.indexOf.WhileBegin,
+      whileEnd = this.indexOf.WhileEnd;
+    for (i = 0; i < this.instructions.length - g; i += 1) {
+      if (this.random.nextIntBetween(0, this.piece.loopSkipCreateRate) === 0) {
+        this.instructions[i] = whileBegin;
+        this.instructions[i + this.random.nextIntBetween(e, f)] = whileEnd;
+        this.instructions[i + this.random.nextIntBetween(a, b)] = whileBegin;
+        this.instructions[i + this.random.nextIntBetween(c, d)] = whileEnd;
+        i += g;
+      }
+    }
+  };
 
-  if (instrument.low === instrument.high) {
-    return instrument.low;
-  }
-
-  // Find the first C and make that 0.
-  if (noteStart % 12 !== 0) {
-    noteStart += (12 - (instrument.low % 12));
-  }
-
-  if (x === 0) {
-    return noteStart;
-  }
-
-  if (x > 0) {
-    for (i = 0; i < x; i += 1) {
-      noteStart += 1;
-      while (!piece.pitchClass[noteStart % 12]) { noteStart += 1; }
-
-      //Octave down as far as possible if out of range.
-      if (noteStart > instrument.high) {
-        while (noteStart - 12 >= instrument.low) {
-          noteStart -= 12;
+  this.getProbableInstruction = function (normalizedNumber) {
+    var k, bestKey = 'NullOp', lowestValue = 2; //i.e. a number > 1
+    for (k in this.distribution) {
+      if (this.distribution.hasOwnProperty(k)) {
+        if (normalizedNumber < this.distribution[k] &&
+            this.distribution[k] < lowestValue) {
+          lowestValue = this.distribution[k];
+          bestKey = k;
         }
       }
     }
-  } else {
-    for (i = 0; i < -x; i += 1) {
-      noteStart -= 1;
-      while (!piece.pitchClass[noteStart % 12]) { noteStart -= 1; }
+    return this.indexOf[bestKey];
+  };
 
-      //Octave up as far as possible if out of range.
-      if (noteStart < instrument.low) {
-        while (noteStart + 12 <= instrument.high) {
-          noteStart += 12;
-        }
+  this.planInstructions = function () {
+    var i, n = this.instructions.length, inversionProbability;
+    for (i = 0; i < n; i += 1) {
+      inversionProbability = (Math.floor(i / Math.floor(n /
+        this.piece.probabilityInversionSections)) % 2);
+      this.distributeProbabilities(inversionProbability);
+      if (this.instructions[i] === 0) {
+        this.instructions[i] = this.getProbableInstruction(this.random.nextFloat());
       }
     }
-  }
-  return noteStart;
-}
-
-function makeNote(offset, duration, pitch, dynamicMark) {
-  var n = {
-    "time": offset,
-    "duration": duration,
-    "pitch": pitch,
-    "dynamicMark": dynamicMark
   };
-  return n;
-}
 
-function addNote(instrument, data) {
-  var instrumentIsOn = toggles[instrument.group],
-    actualPitch = lookupPitch(instrument, data),
-    duration,
-    longestNote;
-  if (instrument.offset === globalTime) {
-    duration = durations[durationIndex];
-    if (instrumentIsOn) {
-      instrument.notes.push(makeNote(instrument.offset, duration,
-        actualPitch, dynamic[instrument.dynamicMark]));
-    }
-    instrument.offset += duration;
-    globalTime = instrument.offset;
-  } else if (instrument.offset < globalTime) {
-    longestNote = piece.longestNote * durationLCM / 4;
-    if (globalTime - instrument.offset > longestNote) {
-      instrument.offset = globalTime - longestNote;
-    }
-    duration = globalTime - instrument.offset;
-    if (instrumentIsOn) {
-      instrument.notes.push(makeNote(instrument.offset, duration,
-        actualPitch, dynamic[instrument.dynamicMark]));
-    }
-    instrument.offset += duration;
-  }
-}
+  this.halt = function () {
+    return this.instructionPointer >= this.instructions.length || this.instructionPointer < 0;
+  };
 
-function emit(i) {
-  var index = indexOf[i], instrumentId, indexToToggle,
-    dynamicId, dynamicType, dynamicInstrument, dynamicMark;
-  if (i === 'DecrementDuration') {
-    durationIndex = Math.max(0, durationIndex - 1);
-  } else if (i === 'IncrementDuration') {
-    durationIndex = Math.min(durations.length - 1, durationIndex + 1);
-  } else if (index >= indexOf.EmitFlute &&
-             index <= indexOf.EmitDoubleBass) {
-    instrumentId = index - indexOf.EmitFlute;
-    addNote(instruments[instrumentId], getData());
-  } else if (index >= indexOf.ToggleWinds &&
-             index <= indexOf.ToggleStrings) {
-    indexToToggle = index - indexOf.ToggleWinds;
-    toggles[indexToToggle] = !toggles[indexToToggle];
-    if (!toggles[0] && !toggles[1] && !toggles[2] && !toggles[3]) {
-      toggles = [true, true, true, true];
+  this.getInstruction = function () {
+    return this.instructionSet[this.instructions[this.instructionPointer]];
+  };
+
+  this.getCyclicDataPointer = function () {
+    return (this.dataPointer + this.data.length * Math.abs(this.dataPointer)) % this.data.length;
+  };
+
+  this.getData = function () {
+    return this.data[this.getCyclicDataPointer()];
+  };
+
+  this.addToData = function (amount) {
+    var x = this.getCyclicDataPointer();
+    this.data[x] = (this.data[x] + amount + 256) % 256;
+  };
+
+  this.lookupPitch = function (instrument, p) {
+    var x, i, noteStart = instrument.low;
+    x = p < 128 ? p : p - 256;
+
+    if (instrument.low === instrument.high) {
+      return instrument.low;
     }
-  } else if (index >= indexOf.FluteSoft && index <= indexOf.DoubleBassLouder) {
-    dynamicId = index - indexOf.FluteSoft;
-    dynamicType = dynamicId % 4;
-    dynamicInstrument = (dynamicId - dynamicType) / 4;
-    dynamicMark = instruments[dynamicInstrument].dynamicMark;
-    if (dynamicType === 0) {
-      dynamicMark = 2;
-    } else if (dynamicType === 1) {
-      dynamicMark = 4;
-    } else if (dynamicType === 2) {
-      if (piece.wrapDynamics) {
-        dynamicMark = (dynamics + dynamicMark - 1) % dynamics;
-      } else {
-        dynamicMark = Math.max(dynamicMark - 1, 0);
+
+    // Find the first C and make that 0.
+    if (noteStart % 12 !== 0) {
+      noteStart += (12 - (instrument.low % 12));
+    }
+
+    if (x === 0) {
+      return noteStart;
+    }
+
+    if (x > 0) {
+      for (i = 0; i < x; i += 1) {
+        noteStart += 1;
+        while (!this.piece.pitchClass[noteStart % 12]) { noteStart += 1; }
+
+        //Octave down as far as possible if out of range.
+        if (noteStart > instrument.high) {
+          while (noteStart - 12 >= instrument.low) {
+            noteStart -= 12;
+          }
+        }
       }
     } else {
-      if (piece.wrapDynamics) {
-        dynamicMark = (dynamics + dynamicMark + 1) % dynamics;
-      } else {
-        dynamicMark = Math.min(dynamicMark + 1, dynamics - 1);
+      for (i = 0; i < -x; i += 1) {
+        noteStart -= 1;
+        while (!this.piece.pitchClass[noteStart % 12]) { noteStart -= 1; }
+
+        //Octave up as far as possible if out of range.
+        if (noteStart < instrument.low) {
+          while (noteStart + 12 <= instrument.high) {
+            noteStart += 12;
+          }
+        }
       }
     }
-    instruments[dynamicInstrument].dynamicMark = dynamicMark;
-  }
-}
+    return noteStart;
+  };
 
-function performInstruction() {
-  if (halt()) {
-    return false;
-  }
-  var i = getInstruction(), braceCount;
-  if (i === "MoveForward") {
-    dataPointer += 1;
-  } else if (i === "MoveBackward") {
-    dataPointer -= 1;
-  } else if (i === "IncrementData") {
-    addToData(1);
-  } else if (i === "DecrementData") {
-    addToData(-1);
-  } else if ((i === "WhileBegin" && !getData()) || (i === "WhileEnd" && getData())) {
-    if (i !== "WhileEnd" || random.nextIntBetween(0, piece.loopContinueRate)) {
-      //Perform jump operation to emulate while loops.
-      braceCount = 1;
-      do {
-        instructionPointer += (i === "WhileBegin" ? 1 : -1);
-        if (halt()) {
-          return false;
-        }
-        if (getInstruction() === (i === "WhileBegin" ? "WhileEnd" : "WhileBegin")) {
-          braceCount -= 1;
-        } else if (getInstruction() === (i === "WhileEnd" ? "WhileEnd" : "WhileBegin")) {
-          braceCount += 1;
-        }
-      } while (braceCount > 0);
-    }
-  } else {
-    emit(i);
-  }
-  instructionPointer += 1;
-  return true;
-}
+  this.makeNote = function (offset, duration, pitch, dynamicMark) {
+    var n = {
+      "time": offset,
+      "duration": duration,
+      "pitch": pitch,
+      "dynamicMark": dynamicMark
+    };
+    return n;
+  };
 
-function createMultiplyWithCarryPRNG(seed) {
-  function get32BitLow(x) {
-    return x >>> 0;
-  }
-
-  function get32BitHigh(x) {
-    return (x - get32BitLow(x)) / 0x100000000;
-  }
-
-  function is32Bit(x) {
-    return x >= 0 && x < 0x100000000 && x === Math.floor(x);
-  }
-
-  function multiply32BitHigh(a, b) {
-    return get32BitHigh(get32BitLow(a) * get32BitLow(b));
-  }
-
-  function multiply32BitLow(a, b) {
-    var ah = (get32BitLow(a) >>> 16) & 0xffff, al = get32BitLow(a) & 0xffff,
-      bh = (get32BitLow(b) >>> 16) & 0xffff, bl = get32BitLow(b) & 0xffff;
-    return ((al * bl) + ((ah * bl + al * bh) << 16) >>> 0);
-  }
-
-  var state = [], generator = {
-    next : function () {
-      var magicNumbers = [5115, 1776, 1492, 2111111111], low = 0, high = 0, i;
-      for (i = 0; i < magicNumbers.length; i += 1) {
-        low += multiply32BitLow(state[i], magicNumbers[i]);
-        high += multiply32BitHigh(state[i], magicNumbers[i]);
+  this.addNote = function (instrument, data) {
+    var instrumentIsOn = this.toggles[instrument.group],
+      actualPitch = this.lookupPitch(instrument, data),
+      duration,
+      longestNote;
+    if (instrument.offset === this.globalTime) {
+      duration = this.durations[this.durationIndex];
+      if (instrumentIsOn) {
+        instrument.notes.push(this.makeNote(instrument.offset, duration,
+          actualPitch, this.dynamic[instrument.dynamicMark]));
       }
-      low += state.pop();
-      high += get32BitHigh(low);
-      low = get32BitLow(low);
-      state.unshift(low);
-      state.pop();
-      state.push(high);
-      return state[0];
-    },
-
-    nextFloat : function () {
-      var high = this.next() * 0x100000,
-        low = this.next() >>> 12;
-      return (high + low) / Math.pow(2, 52);
-    },
-
-    nextIntBetween : function (a, b) {
-      return Math.floor(a + this.nextFloat() * (b - a));
-    },
-
-    reseed : function (s) {
-      var i;
-      if (!is32Bit(s)) {
-        console.log(s + " is not a valid seed. Forcing to 0.");
-        s = 0;
+      instrument.offset += duration;
+      this.globalTime = instrument.offset;
+    } else if (instrument.offset < this.globalTime) {
+      longestNote = this.piece.longestNote * this.durationLCM / 4;
+      if (this.globalTime - instrument.offset > longestNote) {
+        instrument.offset = this.globalTime - longestNote;
       }
-      for (i = 0; i < 5; i += 1) {
-        s = get32BitLow(multiply32BitLow(29943829, s) + 0xffffffff);
-        state.push(s);
+      duration = this.globalTime - instrument.offset;
+      if (instrumentIsOn) {
+        instrument.notes.push(this.makeNote(instrument.offset, duration,
+          actualPitch, this.dynamic[instrument.dynamicMark]));
       }
-      for (i = 0; i < 100; i += 1) {
-        this.next();
-      }
+      instrument.offset += duration;
     }
   };
-  generator.reseed(seed);
-  return generator;
-}
 
-function createPiece(pieceToUse) {
-  piece = pieceToUse;
-  probabilities = pieceToUse.probabilityOf;
-
-  // Initialize random number generator;
-  random = createMultiplyWithCarryPRNG(piece.seed);
-
-  // Initialize constants and distributions.
-  createDurations();
-  createInstruments();
-
-  // Initialize state and maps.
-  var i, shouldContinue = true;
-  for (i = 0; i < piece.codeLength; i += 1) { instructions[i] = 0; }
-  for (i = 0; i < piece.tapeLength; i += 1) { data[i] = 0; }
-
-  planLoops();
-  planInstructions();
-  while (shouldContinue) {
-    shouldContinue = performInstruction();
-  }
-}
-
-function pieceAsCSV() {
-  var i, j, pieceString = 'Instrument,Channel,Start,Duration,Key,Dynamic\n',
-    instrument, note;
-  for (i = 0; i < instruments.length; i += 1) {
-    instrument = instruments[i];
-    for (j = 0; j < instrument.notes.length; j += 1) {
-      note = instrument.notes[j];
-      pieceString += instrument.name + ',' + instrument.index + ',' +
-        note.time + ',' + note.duration + ',' + note.pitch + ',' +
-        note.dynamicMark + '\n';
+  this.emit = function (i) {
+    var index = this.indexOf[i], instrumentId, indexToToggle,
+      dynamicId, dynamicType, dynamicInstrument, dynamicMark;
+    if (i === 'DecrementDuration') {
+      this.durationIndex = Math.max(0, this.durationIndex - 1);
+    } else if (i === 'IncrementDuration') {
+      this.durationIndex = Math.min(this.durations.length - 1, this.durationIndex + 1);
+    } else if (index >= this.indexOf.EmitFlute &&
+               index <= this.indexOf.EmitDoubleBass) {
+      instrumentId = index - this.indexOf.EmitFlute;
+      this.addNote(this.instruments[instrumentId], this.getData());
+    } else if (index >= this.indexOf.ToggleWinds &&
+               index <= this.indexOf.ToggleStrings) {
+      indexToToggle = index - this.indexOf.ToggleWinds;
+      this.toggles[indexToToggle] = !this.toggles[indexToToggle];
+      if (!this.toggles[0] && !this.toggles[1] && !this.toggles[2] && !this.toggles[3]) {
+        this.toggles = [true, true, true, true];
+      }
+    } else if (index >= this.indexOf.FluteSoft && index <= this.indexOf.DoubleBassLouder) {
+      dynamicId = index - this.indexOf.FluteSoft;
+      dynamicType = dynamicId % 4;
+      dynamicInstrument = (dynamicId - dynamicType) / 4;
+      dynamicMark = this.instruments[dynamicInstrument].dynamicMark;
+      if (dynamicType === 0) {
+        dynamicMark = 2;
+      } else if (dynamicType === 1) {
+        dynamicMark = 4;
+      } else if (dynamicType === 2) {
+        if (this.piece.wrapDynamics) {
+          dynamicMark = (this.dynamics + dynamicMark - 1) % this.dynamics;
+        } else {
+          dynamicMark = Math.max(dynamicMark - 1, 0);
+        }
+      } else {
+        if (this.piece.wrapDynamics) {
+          dynamicMark = (this.dynamics + dynamicMark + 1) % this.dynamics;
+        } else {
+          dynamicMark = Math.min(dynamicMark + 1, this.dynamics - 1);
+        }
+      }
+      this.instruments[dynamicInstrument].dynamicMark = dynamicMark;
     }
-  }
-  return pieceString.trim();
-}
+  };
 
-function noteTimeToSeconds(noteTime) {
-  return noteTime * 4 * 60 / piece.tempo / durationLCM;
-}
-
-function dynamicMarkToVelocity(dynamicMark) {
-  return Math.round(dynamicMark / 7 * 87) + 20;
-}
-
-function pieceAsMIDI() {
-  var midiData = [], instrument, note, i, j;
-  for (i = 0; i < instruments.length; i += 1) {
-    instrument = instruments[i];
-    for (j = 0; j < instrument.notes.length; j += 1) {
-      note = instrument.notes[j];
-      midiData.push({
-        "time": noteTimeToSeconds(note.time),
-        "duration": noteTimeToSeconds(note.duration),
-        "channel": instrument.index,
-        "pitch": note.pitch,
-        "velocity": dynamicMarkToVelocity(note.dynamicMark)
-      });
+  this.performInstruction = function () {
+    if (this.halt()) {
+      return false;
     }
-  }
-  return midiData;
-}
+    var i = this.getInstruction(), braceCount;
+    if (i === "MoveForward") {
+      this.dataPointer += 1;
+    } else if (i === "MoveBackward") {
+      this.dataPointer -= 1;
+    } else if (i === "IncrementData") {
+      this.addToData(1);
+    } else if (i === "DecrementData") {
+      this.addToData(-1);
+    } else if ((i === "WhileBegin" && !this.getData()) || (i === "WhileEnd" && this.getData())) {
+      if (i !== "WhileEnd" || this.random.nextIntBetween(0, this.piece.loopContinueRate)) {
+        //Perform jump operation to emulate while loops.
+        braceCount = 1;
+        do {
+          this.instructionPointer += (i === "WhileBegin" ? 1 : -1);
+          if (this.halt()) {
+            return false;
+          }
+          if (this.getInstruction() === (i === "WhileBegin" ? "WhileEnd" : "WhileBegin")) {
+            braceCount -= 1;
+          } else if (this.getInstruction() === (i === "WhileEnd" ? "WhileEnd" : "WhileBegin")) {
+            braceCount += 1;
+          }
+        } while (braceCount > 0);
+      }
+    } else {
+      this.emit(i);
+    }
+    this.instructionPointer += 1;
+    return true;
+  };
 
-function parityChecksum(s) {
-  var parity = 0, i;
-  for (i = 0; i < s.length; i += 1) {
-    parity = (parity + s.charCodeAt(i)) >>> 0;
-  }
-  return parity;
-}
+  this.createMultiplyWithCarryPRNG = function (seed) {
+    function get32BitLow(x) {
+      return x >>> 0;
+    }
+
+    function get32BitHigh(x) {
+      return (x - get32BitLow(x)) / 0x100000000;
+    }
+
+    function is32Bit(x) {
+      return x >= 0 && x < 0x100000000 && x === Math.floor(x);
+    }
+
+    function multiply32BitHigh(a, b) {
+      return get32BitHigh(get32BitLow(a) * get32BitLow(b));
+    }
+
+    function multiply32BitLow(a, b) {
+      var ah = (get32BitLow(a) >>> 16) & 0xffff, al = get32BitLow(a) & 0xffff,
+        bh = (get32BitLow(b) >>> 16) & 0xffff, bl = get32BitLow(b) & 0xffff;
+      return ((al * bl) + ((ah * bl + al * bh) << 16) >>> 0);
+    }
+
+    var state = [], generator = {
+      next : function () {
+        var magicNumbers = [5115, 1776, 1492, 2111111111], low = 0, high = 0, i;
+        for (i = 0; i < magicNumbers.length; i += 1) {
+          low += multiply32BitLow(state[i], magicNumbers[i]);
+          high += multiply32BitHigh(state[i], magicNumbers[i]);
+        }
+        low += state.pop();
+        high += get32BitHigh(low);
+        low = get32BitLow(low);
+        state.unshift(low);
+        state.pop();
+        state.push(high);
+        return state[0];
+      },
+
+      nextFloat : function () {
+        var high = this.next() * 0x100000,
+          low = this.next() >>> 12;
+        return (high + low) / Math.pow(2, 52);
+      },
+
+      nextIntBetween : function (a, b) {
+        return Math.floor(a + this.nextFloat() * (b - a));
+      },
+
+      reseed : function (s) {
+        var i;
+        if (!is32Bit(s)) {
+          console.log(s + " is not a valid seed. Forcing to 0.");
+          s = 0;
+        }
+        for (i = 0; i < 5; i += 1) {
+          s = get32BitLow(multiply32BitLow(29943829, s) + 0xffffffff);
+          state.push(s);
+        }
+        for (i = 0; i < 100; i += 1) {
+          this.next();
+        }
+      }
+    };
+    generator.reseed(seed);
+    return generator;
+  };
+
+  this.createPiece = function () {
+    // Initialize random number generator;
+    this.random = this.createMultiplyWithCarryPRNG(this.piece.seed);
+
+    // Initialize constants and distributions.
+    this.createDurations();
+    this.createInstruments();
+
+    // Initialize state and maps.
+    var i, shouldContinue = true;
+    for (i = 0; i < this.piece.codeLength; i += 1) { this.instructions[i] = 0; }
+    for (i = 0; i < this.piece.tapeLength; i += 1) { this.data[i] = 0; }
+
+    this.planLoops();
+    this.planInstructions();
+    while (shouldContinue) {
+      shouldContinue = this.performInstruction();
+    }
+  };
+
+  this.pieceAsCSV = function () {
+    var i, j, pieceString = 'Instrument,Channel,Start,Duration,Key,Dynamic\n',
+      instrument, note;
+    for (i = 0; i < this.instruments.length; i += 1) {
+      instrument = this.instruments[i];
+      for (j = 0; j < instrument.notes.length; j += 1) {
+        note = instrument.notes[j];
+        pieceString += instrument.name + ',' + instrument.index + ',' +
+          note.time + ',' + note.duration + ',' + note.pitch + ',' +
+          note.dynamicMark + '\n';
+      }
+    }
+    return pieceString.trim();
+  };
+
+  this.noteTimeToSeconds = function (noteTime) {
+    return noteTime * 4 * 60 / this.piece.tempo / this.durationLCM;
+  };
+
+  this.dynamicMarkToVelocity = function (dynamicMark) {
+    return Math.round(dynamicMark / 7 * 87) + 20;
+  };
+
+  this.pieceAsMIDI = function () {
+    var midiData = [], instrument, note, i, j;
+    for (i = 0; i < this.instruments.length; i += 1) {
+      instrument = this.instruments[i];
+      for (j = 0; j < instrument.notes.length; j += 1) {
+        note = instrument.notes[j];
+        midiData.push({
+          "time": this.noteTimeToSeconds(note.time),
+          "duration": this.noteTimeToSeconds(note.duration),
+          "channel": instrument.index,
+          "pitch": note.pitch,
+          "velocity": this.dynamicMarkToVelocity(note.dynamicMark)
+        });
+      }
+    }
+    return midiData;
+  };
+
+  this.parityChecksum = function (s) {
+    var parity = 0, i;
+    for (i = 0; i < s.length; i += 1) {
+      parity = (parity + s.charCodeAt(i)) >>> 0;
+    }
+    return parity;
+  };
+};
+
 
 ////////////////////////////////////////////////////////////////////////////////
+
 
 function isRunningUnderNodeJS() {
   var isNodeJS = false, typeOfGlobal = typeof global;
@@ -634,11 +639,12 @@ function isRunningUnderNodeJS() {
 }
 
 function generateInConsole() {
-  createPiece(pieceConfiguration());
-  var finalPiece = pieceAsCSV();
-  console.log('CSV of piece:\n' + finalPiece);
-  console.log('Parity of CSV: ' + parityChecksum(finalPiece));
-  if (parityChecksum(finalPiece) !== 6820566) {
+  var pieceGenerator = new PieceGenerator(pieceConfiguration()), pieceCSV;
+  pieceGenerator.createPiece();
+  pieceCSV = pieceGenerator.pieceAsCSV();
+  console.log('CSV of piece:\n' + pieceCSV);
+  console.log('Parity of CSV: ' + pieceGenerator.parityChecksum(pieceCSV));
+  if (pieceGenerator.parityChecksum(pieceCSV) !== 6820566) {
     console.log('WARNING: piece does not match reference');
   }
 }
@@ -886,12 +892,16 @@ function frequencyToMIDINoteNumber(frequency) {
 }
 
 function getPieceAsMIDILikeData() {
-  createPiece(pieceConfiguration());
-  var pieceData = pieceAsMIDI(), csv = pieceAsCSV(), sortKey = "time";
-  if (parityChecksum(csv) !== 6820566) {
+  var pieceGenerator, pieceData, csv, sortKey;
+  pieceGenerator = new PieceGenerator(pieceConfiguration());
+  pieceGenerator.createPiece();
+  pieceData = pieceGenerator.pieceAsMIDI();
+  csv = pieceGenerator.pieceAsCSV();
+  sortKey = "time";
+  if (pieceGenerator.parityChecksum(csv) !== 6820566) {
     console.log('Warning: piece differs from original Steal This Piece');
   }
-  console.log('Parity of CSV: ' + parityChecksum(csv));
+  console.log('Parity of CSV: ' + pieceGenerator.parityChecksum(csv));
   pieceData.sort(function (a, b) {
     if (a[sortKey] < b[sortKey]) {
       return -1;
@@ -979,3 +989,20 @@ function shutdownGracefully() {
 if (isRunningUnderNodeJS()) {
   generateInConsole();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
