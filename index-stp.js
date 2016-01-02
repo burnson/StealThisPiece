@@ -25,7 +25,6 @@ function setPiece() {
   piece.rhythmEighth = true;
   piece.rhythmTripletQuarter = true;
   piece.rhythmQuarter = false;
-  piece.useHairpins = true;
   piece.wrapDynamics = true;
   piece.pitchClass = [
     true, true, true, true,
@@ -34,91 +33,94 @@ function setPiece() {
   ];
 
   probabilities = {};
-  probabilities.MoveBackward = 200000;
-  probabilities.MoveForward = 200000;
-  probabilities.DecrementData = 200000;
-  probabilities.IncrementData = 200000;
-  probabilities.DecrementDuration = 5000;
-  probabilities.IncrementDuration = 5000;
-  probabilities.EmitFlute = 400;
-  probabilities.EmitOboe = 400;
-  probabilities.EmitClarinet = 200;
-  probabilities.EmitBassoon = 200;
-  probabilities.EmitHorn = 100;
-  probabilities.EmitTrumpet = 200;
-  probabilities.EmitTrombone = 100;
-  probabilities.EmitBaritoneSax = 500;
-  probabilities.EmitVibraphone = 500;
-  probabilities.EmitCrotales = 100;
-  probabilities.EmitViolin = 500;
-  probabilities.EmitViola = 500;
-  probabilities.EmitCello = 300;
-  probabilities.EmitDoubleBass = 100;
-  probabilities.ToggleWinds = 1000;
-  probabilities.ToggleBrass = 1000;
-  probabilities.TogglePercussion = 1000;
-  probabilities.ToggleStrings = 1000;
-  probabilities.FluteSoft = 10;
-  probabilities.FluteLoud = 10;
-  probabilities.FluteSofter = 10;
-  probabilities.FluteLouder = 10;
-  probabilities.OboeSoft = 10;
-  probabilities.OboeLoud = 10;
-  probabilities.OboeSofter = 10;
-  probabilities.OboeLouder = 10;
-  probabilities.ClarinetSoft = 10;
-  probabilities.ClarinetLoud = 10;
-  probabilities.ClarinetSofter = 10;
-  probabilities.ClarinetLouder = 10;
-  probabilities.BassoonSoft = 10;
-  probabilities.BassoonLoud = 10;
-  probabilities.BassoonSofter = 10;
-  probabilities.BassoonLouder = 10;
-  probabilities.HornSoft = 10;
-  probabilities.HornLoud = 10;
-  probabilities.HornSofter = 10;
-  probabilities.HornLouder = 10;
-  probabilities.TrumpetSoft = 10;
-  probabilities.TrumpetLoud = 10;
-  probabilities.TrumpetSofter = 10;
-  probabilities.TrumpetLouder = 10;
-  probabilities.TromboneSoft = 10;
-  probabilities.TromboneLoud = 10;
-  probabilities.TromboneSofter = 10;
-  probabilities.TromboneLouder = 10;
-  probabilities.BaritoneSaxSoft = 10;
-  probabilities.BaritoneSaxLoud = 10;
-  probabilities.BaritoneSaxSofter = 10;
-  probabilities.BaritoneSaxLouder = 10;
-  probabilities.VibraphoneSoft = 10;
-  probabilities.VibraphoneLoud = 10;
-  probabilities.VibraphoneSofter = 10;
-  probabilities.VibraphoneLouder = 10;
-  probabilities.CrotalesSoft = 10;
-  probabilities.CrotalesLoud = 10;
-  probabilities.CrotalesSofter = 10;
-  probabilities.CrotalesLouder = 10;
-  probabilities.ViolinSoft = 10;
-  probabilities.ViolinLoud = 10;
-  probabilities.ViolinSofter = 10;
-  probabilities.ViolinLouder = 10;
-  probabilities.ViolaSoft = 10;
-  probabilities.ViolaLoud = 10;
-  probabilities.ViolaSofter = 10;
-  probabilities.ViolaLouder = 10;
-  probabilities.CelloSoft = 10;
-  probabilities.CelloLoud = 10;
-  probabilities.CelloSofter = 10;
-  probabilities.CelloLouder = 10;
-  probabilities.DoubleBassSoft = 10;
-  probabilities.DoubleBassLoud = 10;
-  probabilities.DoubleBassSofter = 10;
-  probabilities.DoubleBassLouder = 10;
+  probabilities.NullOp = 0;
+  probabilities.WhileBegin = 0;
+  probabilities.WhileEnd = 0;
+  probabilities.MoveBackward = 20000;
+  probabilities.MoveForward = 20000;
+  probabilities.DecrementData = 20000;
+  probabilities.IncrementData = 20000;
+  probabilities.DecrementDuration = 500;
+  probabilities.IncrementDuration = 500;
+  probabilities.EmitFlute = 40;
+  probabilities.EmitOboe = 40;
+  probabilities.EmitClarinet = 20;
+  probabilities.EmitBassoon = 20;
+  probabilities.EmitHorn = 10;
+  probabilities.EmitTrumpet = 20;
+  probabilities.EmitTrombone = 10;
+  probabilities.EmitBaritoneSax = 50;
+  probabilities.EmitVibraphone = 50;
+  probabilities.EmitCrotales = 10;
+  probabilities.EmitViolin = 50;
+  probabilities.EmitViola = 50;
+  probabilities.EmitCello = 30;
+  probabilities.EmitDoubleBass = 10;
+  probabilities.ToggleWinds = 100;
+  probabilities.ToggleBrass = 100;
+  probabilities.TogglePercussion = 100;
+  probabilities.ToggleStrings = 100;
+  probabilities.FluteSoft = 1;
+  probabilities.FluteLoud = 1;
+  probabilities.FluteSofter = 1;
+  probabilities.FluteLouder = 1;
+  probabilities.OboeSoft = 1;
+  probabilities.OboeLoud = 1;
+  probabilities.OboeSofter = 1;
+  probabilities.OboeLouder = 1;
+  probabilities.ClarinetSoft = 1;
+  probabilities.ClarinetLoud = 1;
+  probabilities.ClarinetSofter = 1;
+  probabilities.ClarinetLouder = 1;
+  probabilities.BassoonSoft = 1;
+  probabilities.BassoonLoud = 1;
+  probabilities.BassoonSofter = 1;
+  probabilities.BassoonLouder = 1;
+  probabilities.HornSoft = 1;
+  probabilities.HornLoud = 1;
+  probabilities.HornSofter = 1;
+  probabilities.HornLouder = 1;
+  probabilities.TrumpetSoft = 1;
+  probabilities.TrumpetLoud = 1;
+  probabilities.TrumpetSofter = 1;
+  probabilities.TrumpetLouder = 1;
+  probabilities.TromboneSoft = 1;
+  probabilities.TromboneLoud = 1;
+  probabilities.TromboneSofter = 1;
+  probabilities.TromboneLouder = 1;
+  probabilities.BaritoneSaxSoft = 1;
+  probabilities.BaritoneSaxLoud = 1;
+  probabilities.BaritoneSaxSofter = 1;
+  probabilities.BaritoneSaxLouder = 1;
+  probabilities.VibraphoneSoft = 1;
+  probabilities.VibraphoneLoud = 1;
+  probabilities.VibraphoneSofter = 1;
+  probabilities.VibraphoneLouder = 1;
+  probabilities.CrotalesSoft = 1;
+  probabilities.CrotalesLoud = 1;
+  probabilities.CrotalesSofter = 1;
+  probabilities.CrotalesLouder = 1;
+  probabilities.ViolinSoft = 1;
+  probabilities.ViolinLoud = 1;
+  probabilities.ViolinSofter = 1;
+  probabilities.ViolinLouder = 1;
+  probabilities.ViolaSoft = 1;
+  probabilities.ViolaLoud = 1;
+  probabilities.ViolaSofter = 1;
+  probabilities.ViolaLouder = 1;
+  probabilities.CelloSoft = 1;
+  probabilities.CelloLoud = 1;
+  probabilities.CelloSofter = 1;
+  probabilities.CelloLouder = 1;
+  probabilities.DoubleBassSoft = 1;
+  probabilities.DoubleBassLoud = 1;
+  probabilities.DoubleBassSofter = 1;
+  probabilities.DoubleBassLouder = 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-var piece = {}, probabilities = {}, random;
+var piece = {}, probabilities = {}, distribution = {}, random;
 var durationIndex = 0;
 var durations = [];
 var durationLCM = 48;
@@ -131,32 +133,7 @@ var globalTime = 0;
 var dynamics = 7;
 var dynamic = [0, 1, 2, 3, 4, 5, 6];
 
-function distributeProbabilities(amount) {
-  // Apply probability inversion if being used.
-  probabilities.MoveBackward -= piece.computationRateInversion * probabilities.MoveBackward * amount;
-  probabilities.MoveForward -= piece.computationRateInversion * probabilities.MoveForward * amount;
-  probabilities.DecrementData -= piece.computationRateInversion * probabilities.DecrementData * amount;
-  probabilities.IncrementData -= piece.computationRateInversion * probabilities.IncrementData * amount;
-
-  // Turn the probabilities into a distribution.
-  var sum = 0, instruction;
-  for (instruction in probabilities) {
-    if (probabilities.hasOwnProperty(instruction)) {
-      sum += probabilities[instruction];
-      probabilities[instruction] = sum;
-    }
-  }
-
-  // Normalize the distribution.
-  for (instruction in probabilities) {
-    if (probabilities.hasOwnProperty(instruction)) {
-      probabilities[instruction] /= sum;
-    }
-  }
-}
-
-// Instruction set
-var nameOf = [
+var instructionSet = [
   "NullOp", "WhileBegin", "WhileEnd", "MoveBackward", "MoveForward",
   "DecrementData", "IncrementData", "DecrementDuration", "IncrementDuration",
   "EmitFlute", "EmitOboe", "EmitClarinet", "EmitBassoon", "EmitHorn",
@@ -181,11 +158,44 @@ var nameOf = [
 
 var indexOf = (function () {
   var x = {}, i;
-  for (i = 0; i < nameOf.length; i += 1) {
-    x[nameOf[i]] = i;
+  for (i = 0; i < instructionSet.length; i += 1) {
+    x[instructionSet[i]] = i;
   }
   return x;
 }());
+
+function distributeProbabilities(inversionProbability) {
+  var inversionAmount = piece.computationRateInversion * inversionProbability,
+    sum = 0,
+    instruction;
+  distribution = {};
+  for (instruction in probabilities) {
+    if (probabilities.hasOwnProperty(instruction)) {
+      distribution[instruction] = probabilities[instruction];
+    }
+  }
+
+  // Apply probability inversion if being used.
+  distribution.MoveBackward -= inversionAmount * distribution.MoveBackward;
+  distribution.MoveForward -= inversionAmount * distribution.MoveForward;
+  distribution.DecrementData -= inversionAmount * distribution.DecrementData;
+  distribution.IncrementData -= inversionAmount * distribution.IncrementData;
+
+  // Turn the probabilities into a distribution.
+  for (instruction in distribution) {
+    if (distribution.hasOwnProperty(instruction)) {
+      sum += distribution[instruction];
+      distribution[instruction] = sum;
+    }
+  }
+
+  // Normalize the distribution.
+  for (instruction in distribution) {
+    if (distribution.hasOwnProperty(instruction)) {
+      distribution[instruction] /= sum;
+    }
+  }
+}
 
 function createDurations() {
   if (piece.rhythmSixteenth) {
@@ -265,11 +275,11 @@ function planLoops() {
 
 function getProbableInstruction(normalizedNumber) {
   var k, bestKey = 'NullOp', lowestValue = 2; //i.e. a number > 1
-  for (k in probabilities) {
-    if (probabilities.hasOwnProperty(k)) {
-      if (normalizedNumber < probabilities[k] &&
-          probabilities[k] < lowestValue) {
-        lowestValue = probabilities[k];
+  for (k in distribution) {
+    if (distribution.hasOwnProperty(k)) {
+      if (normalizedNumber < distribution[k] &&
+          distribution[k] < lowestValue) {
+        lowestValue = distribution[k];
         bestKey = k;
       }
     }
@@ -280,7 +290,6 @@ function getProbableInstruction(normalizedNumber) {
 function planInstructions() {
   var i, n = instructions.length, inversionProbability;
   for (i = 0; i < n; i += 1) {
-    setPiece();
     inversionProbability = (Math.floor(i / Math.floor(n /
       piece.probabilityInversionSections)) % 2);
     distributeProbabilities(inversionProbability);
@@ -295,7 +304,7 @@ function halt() {
 }
 
 function getInstruction() {
-  return nameOf[instructions[instructionPointer]];
+  return instructionSet[instructions[instructionPointer]];
 }
 
 function getCyclicDataPointer() {
@@ -550,7 +559,6 @@ function createPiece() {
   // Initialize constants and distributions.
   createDurations();
   createInstruments();
-  distributeProbabilities(0.0);
 
   // Initialize state and maps.
   var i, shouldContinue = true;
@@ -605,6 +613,16 @@ function pieceAsMIDI() {
   return midiData;
 }
 
+function parityChecksum(s) {
+  var parity = 0, i;
+  for (i = 0; i < s.length; i += 1) {
+    parity = (parity + s.charCodeAt(i)) >>> 0;
+  }
+  return parity;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 function isRunningUnderNodeJS() {
   var isNodeJS = false, typeOfGlobal = typeof global;
   if (typeOfGlobal !== "undefined") {
@@ -613,14 +631,6 @@ function isRunningUnderNodeJS() {
     }
   }
   return isNodeJS;
-}
-
-function parityChecksum(s) {
-  var parity = 0, i;
-  for (i = 0; i < s.length; i += 1) {
-    parity = (parity + s.charCodeAt(i)) >>> 0;
-  }
-  return parity;
 }
 
 function generateInConsole() {
