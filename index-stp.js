@@ -1,121 +1,120 @@
 'use strict';
 
-function pieceConfiguration() {
-  var p = {};
-  p.seed = 133;
-  p.loopContinueRate = 5;
-  p.codeLength = 10000;
-  p.tapeLength = 1024;
-  p.loopStep = 100;
-  p.loopSkipCreateRate = 3;
-  p.loopInnerStartLow = 100;
-  p.loopInnerStartHigh = 100;
-  p.loopInnerEndLow = 100;
-  p.loopInnerEndHigh = 100;
-  p.loopOuterEndLow = 50;
-  p.loopOuterEndHigh = 50;
-  p.longestNote = 4;
-  p.probabilityInversionSections = 10;
-  p.computationRateInversion = 0.9975;
-  p.range = 0;
-  p.tempo = 112;
-  p.rhythmSixteenth = false;
-  p.rhythmTripletEighth = true;
-  p.rhythmEighth = true;
-  p.rhythmTripletQuarter = true;
-  p.rhythmQuarter = false;
-  p.wrapDynamics = true;
-  p.pitchClass = [
+var pieceConfiguration = {
+  seed: 133,
+  loopContinueRate: 5,
+  codeLength: 10000,
+  tapeLength: 1024,
+  loopStep: 100,
+  loopSkipCreateRate: 3,
+  loopInnerStartLow: 100,
+  loopInnerStartHigh: 100,
+  loopInnerEndLow: 100,
+  loopInnerEndHigh: 100,
+  loopOuterEndLow: 50,
+  loopOuterEndHigh: 50,
+  longestNote: 4,
+  probabilityInversionSections: 10,
+  computationRateInversion: 0.9975,
+  range: 0,
+  tempo: 112,
+  rhythmSixteenth: false,
+  rhythmTripletEighth: true,
+  rhythmEighth: true,
+  rhythmTripletQuarter: true,
+  rhythmQuarter: false,
+  wrapDynamics: true,
+  pitchClass: [
     true, true, true, true,
     true, true, true, true,
     true, true, true, true
-  ];
-  p.probabilityOf = {};
-  p.probabilityOf.NullOp = 0;
-  p.probabilityOf.WhileBegin = 0;
-  p.probabilityOf.WhileEnd = 0;
-  p.probabilityOf.MoveBackward = 20000;
-  p.probabilityOf.MoveForward = 20000;
-  p.probabilityOf.DecrementData = 20000;
-  p.probabilityOf.IncrementData = 20000;
-  p.probabilityOf.DecrementDuration = 500;
-  p.probabilityOf.IncrementDuration = 500;
-  p.probabilityOf.EmitFlute = 40;
-  p.probabilityOf.EmitOboe = 40;
-  p.probabilityOf.EmitClarinet = 20;
-  p.probabilityOf.EmitBassoon = 20;
-  p.probabilityOf.EmitHorn = 10;
-  p.probabilityOf.EmitTrumpet = 20;
-  p.probabilityOf.EmitTrombone = 10;
-  p.probabilityOf.EmitBaritoneSax = 50;
-  p.probabilityOf.EmitVibraphone = 50;
-  p.probabilityOf.EmitCrotales = 10;
-  p.probabilityOf.EmitViolin = 50;
-  p.probabilityOf.EmitViola = 50;
-  p.probabilityOf.EmitCello = 30;
-  p.probabilityOf.EmitDoubleBass = 10;
-  p.probabilityOf.ToggleWinds = 100;
-  p.probabilityOf.ToggleBrass = 100;
-  p.probabilityOf.TogglePercussion = 100;
-  p.probabilityOf.ToggleStrings = 100;
-  p.probabilityOf.FluteSoft = 1;
-  p.probabilityOf.FluteLoud = 1;
-  p.probabilityOf.FluteSofter = 1;
-  p.probabilityOf.FluteLouder = 1;
-  p.probabilityOf.OboeSoft = 1;
-  p.probabilityOf.OboeLoud = 1;
-  p.probabilityOf.OboeSofter = 1;
-  p.probabilityOf.OboeLouder = 1;
-  p.probabilityOf.ClarinetSoft = 1;
-  p.probabilityOf.ClarinetLoud = 1;
-  p.probabilityOf.ClarinetSofter = 1;
-  p.probabilityOf.ClarinetLouder = 1;
-  p.probabilityOf.BassoonSoft = 1;
-  p.probabilityOf.BassoonLoud = 1;
-  p.probabilityOf.BassoonSofter = 1;
-  p.probabilityOf.BassoonLouder = 1;
-  p.probabilityOf.HornSoft = 1;
-  p.probabilityOf.HornLoud = 1;
-  p.probabilityOf.HornSofter = 1;
-  p.probabilityOf.HornLouder = 1;
-  p.probabilityOf.TrumpetSoft = 1;
-  p.probabilityOf.TrumpetLoud = 1;
-  p.probabilityOf.TrumpetSofter = 1;
-  p.probabilityOf.TrumpetLouder = 1;
-  p.probabilityOf.TromboneSoft = 1;
-  p.probabilityOf.TromboneLoud = 1;
-  p.probabilityOf.TromboneSofter = 1;
-  p.probabilityOf.TromboneLouder = 1;
-  p.probabilityOf.BaritoneSaxSoft = 1;
-  p.probabilityOf.BaritoneSaxLoud = 1;
-  p.probabilityOf.BaritoneSaxSofter = 1;
-  p.probabilityOf.BaritoneSaxLouder = 1;
-  p.probabilityOf.VibraphoneSoft = 1;
-  p.probabilityOf.VibraphoneLoud = 1;
-  p.probabilityOf.VibraphoneSofter = 1;
-  p.probabilityOf.VibraphoneLouder = 1;
-  p.probabilityOf.CrotalesSoft = 1;
-  p.probabilityOf.CrotalesLoud = 1;
-  p.probabilityOf.CrotalesSofter = 1;
-  p.probabilityOf.CrotalesLouder = 1;
-  p.probabilityOf.ViolinSoft = 1;
-  p.probabilityOf.ViolinLoud = 1;
-  p.probabilityOf.ViolinSofter = 1;
-  p.probabilityOf.ViolinLouder = 1;
-  p.probabilityOf.ViolaSoft = 1;
-  p.probabilityOf.ViolaLoud = 1;
-  p.probabilityOf.ViolaSofter = 1;
-  p.probabilityOf.ViolaLouder = 1;
-  p.probabilityOf.CelloSoft = 1;
-  p.probabilityOf.CelloLoud = 1;
-  p.probabilityOf.CelloSofter = 1;
-  p.probabilityOf.CelloLouder = 1;
-  p.probabilityOf.DoubleBassSoft = 1;
-  p.probabilityOf.DoubleBassLoud = 1;
-  p.probabilityOf.DoubleBassSofter = 1;
-  p.probabilityOf.DoubleBassLouder = 1;
-  return p;
-}
+  ],
+  probabilityOf: {
+    NullOp: 0,
+    WhileBegin: 0,
+    WhileEnd: 0,
+    MoveBackward: 20000,
+    MoveForward: 20000,
+    DecrementData: 20000,
+    IncrementData: 20000,
+    DecrementDuration: 500,
+    IncrementDuration: 500,
+    EmitFlute: 40,
+    EmitOboe: 40,
+    EmitClarinet: 20,
+    EmitBassoon: 20,
+    EmitHorn: 10,
+    EmitTrumpet: 20,
+    EmitTrombone: 10,
+    EmitBaritoneSax: 50,
+    EmitVibraphone: 50,
+    EmitCrotales: 10,
+    EmitViolin: 50,
+    EmitViola: 50,
+    EmitCello: 30,
+    EmitDoubleBass: 10,
+    ToggleWinds: 100,
+    ToggleBrass: 100,
+    TogglePercussion: 100,
+    ToggleStrings: 100,
+    FluteSoft: 1,
+    FluteLoud: 1,
+    FluteSofter: 1,
+    FluteLouder: 1,
+    OboeSoft: 1,
+    OboeLoud: 1,
+    OboeSofter: 1,
+    OboeLouder: 1,
+    ClarinetSoft: 1,
+    ClarinetLoud: 1,
+    ClarinetSofter: 1,
+    ClarinetLouder: 1,
+    BassoonSoft: 1,
+    BassoonLoud: 1,
+    BassoonSofter: 1,
+    BassoonLouder: 1,
+    HornSoft: 1,
+    HornLoud: 1,
+    HornSofter: 1,
+    HornLouder: 1,
+    TrumpetSoft: 1,
+    TrumpetLoud: 1,
+    TrumpetSofter: 1,
+    TrumpetLouder: 1,
+    TromboneSoft: 1,
+    TromboneLoud: 1,
+    TromboneSofter: 1,
+    TromboneLouder: 1,
+    BaritoneSaxSoft: 1,
+    BaritoneSaxLoud: 1,
+    BaritoneSaxSofter: 1,
+    BaritoneSaxLouder: 1,
+    VibraphoneSoft: 1,
+    VibraphoneLoud: 1,
+    VibraphoneSofter: 1,
+    VibraphoneLouder: 1,
+    CrotalesSoft: 1,
+    CrotalesLoud: 1,
+    CrotalesSofter: 1,
+    CrotalesLouder: 1,
+    ViolinSoft: 1,
+    ViolinLoud: 1,
+    ViolinSofter: 1,
+    ViolinLouder: 1,
+    ViolaSoft: 1,
+    ViolaLoud: 1,
+    ViolaSofter: 1,
+    ViolaLouder: 1,
+    CelloSoft: 1,
+    CelloLoud: 1,
+    CelloSofter: 1,
+    CelloLouder: 1,
+    DoubleBassSoft: 1,
+    DoubleBassLoud: 1,
+    DoubleBassSofter: 1,
+    DoubleBassLouder: 1
+  }
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -639,7 +638,8 @@ function isRunningUnderNodeJS() {
 }
 
 function generateInConsole() {
-  var pieceGenerator = new PieceGenerator(pieceConfiguration()), pieceCSV;
+  var pieceGenerator, pieceCSV;
+  pieceGenerator = new PieceGenerator(pieceConfiguration);
   pieceGenerator.createPiece();
   pieceCSV = pieceGenerator.pieceAsCSV();
   console.log('CSV of piece:\n' + pieceCSV);
@@ -893,7 +893,7 @@ function frequencyToMIDINoteNumber(frequency) {
 
 function getPieceAsMIDILikeData() {
   var pieceGenerator, pieceData, csv, sortKey;
-  pieceGenerator = new PieceGenerator(pieceConfiguration());
+  pieceGenerator = new PieceGenerator(pieceConfiguration);
   pieceGenerator.createPiece();
   pieceData = pieceGenerator.pieceAsMIDI();
   csv = pieceGenerator.pieceAsCSV();
