@@ -606,8 +606,13 @@ function pieceAsMIDI() {
 }
 
 function isRunningUnderNodeJS() {
-  return global !== undefined &&
-    Object.prototype.toString.call(global.process) === '[object process]';
+  var isNodeJS = false, typeOfGlobal = typeof global;
+  if (typeOfGlobal !== "undefined") {
+    if (Object.prototype.toString.call(global.process) === '[object process]') {
+      isNodeJS = true;
+    }
+  }
+  return isNodeJS;
 }
 
 function parityChecksum(s) {
@@ -682,165 +687,165 @@ function scheduleOscillator(type, note, startTime, duration, gain, shape) {
 function scheduleFluteNote(note, start, duration, gain) {
   gain /= dBToGain(-28);
   scheduleOscillator('sine', note, start, duration, gain,
-    [{time:0.3, dB:-32},{time:0.9, dB:-32},{time:1.0, dB:-100}]);
+    [{time: 0.3, dB: -32}, {time: 0.9, dB: -32}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 12, start, duration, gain,
-    [{time:0.1, dB:-38},{time:0.9, dB:-38},{time:1.0, dB:-100}]);
+    [{time: 0.1, dB: -38}, {time: 0.9, dB: -38}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 24, start, duration, gain,
-    [{time:0.3, dB:-42},{time:0.9, dB:-42},{time:1.0, dB:-100}]);
+    [{time: 0.3, dB: -42}, {time: 0.9, dB: -42}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 36, start, duration, gain,
-    [{time:0.3, dB:-48},{time:0.9, dB:-48},{time:1.0, dB:-100}]);
+    [{time: 0.3, dB: -48}, {time: 0.9, dB: -48}, {time: 1.0, dB: -100}]);
 }
 
 function scheduleOboeNote(note, start, duration, gain) {
   gain /= dBToGain(-47);
   scheduleOscillator('sine', note, start, duration, gain,
-    [{time:0.1, dB:-50},{time:0.9, dB:-50},{time:1.0, dB:-100}]);
+    [{time: 0.1, dB: -50}, {time: 0.9, dB: -50}, {time: 1.0, dB: -100}]);
   scheduleOscillator('triangle', note + 12, start, duration, gain,
-    [{time:0.1, dB:-55},{time:0.9, dB:-55},{time:1.0, dB:-100}]);
+    [{time: 0.1, dB: -55}, {time: 0.9, dB: -55}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 24, start, duration, gain,
-    [{time:0.3, dB:-60},{time:0.9, dB:-60},{time:1.0, dB:-100}]);
+    [{time: 0.3, dB: -60}, {time: 0.9, dB: -60}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 36, start, duration, gain,
-    [{time:0.3, dB:-65},{time:0.9, dB:-65},{time:1.0, dB:-100}]);
+    [{time: 0.3, dB: -65}, {time: 0.9, dB: -65}, {time: 1.0, dB: -100}]);
 }
 
 function scheduleClarinetNote(note, start, duration, gain) {
   gain /= dBToGain(-50);
   scheduleOscillator('sine', note, start, duration, gain,
-    [{time:0.1, dB:-79},{time:0.9, dB:-79},{time:1.0, dB:-100}]);
+    [{time: 0.1, dB: -79}, {time: 0.9, dB: -79}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 12, start, duration, gain,
-    [{time:0.1, dB:-65},{time:0.9, dB:-65},{time:1.0, dB:-100}]);
+    [{time: 0.1, dB: -65}, {time: 0.9, dB: -65}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 24, start, duration, gain,
-    [{time:0.3, dB:-50},{time:0.9, dB:-50},{time:1.0, dB:-100}]);
+    [{time: 0.3, dB: -50}, {time: 0.9, dB: -50}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 36, start, duration, gain,
-    [{time:0.3, dB:-55},{time:0.9, dB:-55},{time:1.0, dB:-100}]);
+    [{time: 0.3, dB: -55}, {time: 0.9, dB: -55}, {time: 1.0, dB: -100}]);
 }
 
 function scheduleBassoonNote(note, start, duration, gain) {
   gain /= dBToGain(-55);
   scheduleOscillator('sine', note, start, duration, gain,
-    [{time:0.05, dB:-65},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -65}, {time: 0.95, dB: -65}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 12, start, duration, gain,
-    [{time:0.05, dB:-68},{time:0.95, dB:-68},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -68}, {time: 0.95, dB: -68}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 24, start, duration, gain,
-    [{time:0.05, dB:-58},{time:0.95, dB:-58},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -58}, {time: 0.95, dB: -58}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 48, start, duration, gain,
-    [{time:0.05, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -75}, {time: 0.95, dB: -75}, {time: 1.0, dB: -100}]);
 }
 
 function scheduleHornNote(note, start, duration, gain) {
   gain /= dBToGain(-55);
   scheduleOscillator('triangle', note, start, duration, gain,
-    [{time:0.05, dB:-65},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -65}, {time: 0.95, dB: -65}, {time: 1.0, dB: -100}]);
   scheduleOscillator('triangle', note + 12, start, duration, gain,
-    [{time:0.05, dB:-68},{time:0.95, dB:-68},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -68}, {time: 0.95, dB: -68}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 24, start, duration, gain,
-    [{time:0.2, dB:-58},{time:0.95, dB:-58},{time:1.0, dB:-100}]);
+    [{time: 0.2, dB: -58}, {time: 0.95, dB: -58}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 48, start, duration, gain,
-    [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
+    [{time: 0.2, dB: -75}, {time: 0.95, dB: -75}, {time: 1.0, dB: -100}]);
 }
 
 function scheduleTromboneNote(note, start, duration, gain) {
   gain /= dBToGain(-58);
   scheduleOscillator('triangle', note, start, duration, gain,
-    [{time:0.05, dB:-65},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -65}, {time: 0.95, dB: -65}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sawtooth', note + 12, start, duration, gain,
-    [{time:0.05, dB:-55},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -55}, {time: 0.95, dB: -65}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 24, start, duration, gain,
-    [{time:0.2, dB:-58},{time:0.95, dB:-58},{time:1.0, dB:-100}]);
+    [{time: 0.2, dB: -58}, {time: 0.95, dB: -58}, {time: 1.0, dB: -100}]);
   scheduleOscillator('square', note + 48, start, duration, gain,
-    [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
+    [{time: 0.2, dB: -75}, {time: 0.95, dB: -75}, {time: 1.0, dB: -100}]);
 }
 
 function scheduleTrumpetNote(note, start, duration, gain) {
   gain /= dBToGain(-50);
   scheduleOscillator('triangle', note, start, duration, gain,
-    [{time:0.05, dB:-65},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -65}, {time: 0.95, dB: -65}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sawtooth', note + 12, start, duration, gain,
-    [{time:0.05, dB:-55},{time:0.95, dB:-60},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -55}, {time: 0.95, dB: -60}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 24, start, duration, gain,
-    [{time:0.2, dB:-58},{time:0.95, dB:-58},{time:1.0, dB:-100}]);
+    [{time: 0.2, dB: -58}, {time: 0.95, dB: -58}, {time: 1.0, dB: -100}]);
   scheduleOscillator('square', note + 48, start, duration, gain,
-    [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
+    [{time: 0.2, dB: -75}, {time: 0.95, dB: -75}, {time: 1.0, dB: -100}]);
 }
 
 function scheduleBaritoneSaxNote(note, start, duration, gain) {
   gain /= dBToGain(-50);
   scheduleOscillator('square', note, start, duration, gain,
-    [{time:0.05, dB:-62},{time:0.15, dB:-65},{time:0.95, dB:-65},
-    {time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -62}, {time: 0.15, dB: -65}, {time: 0.95, dB: -65},
+      {time: 1.0, dB: -100}]);
   scheduleOscillator('triangle', note + 12, start, duration, gain,
-    [{time:0.05, dB:-52},{time:0.15, dB:-55},{time:0.95, dB:-55},
-    {time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -52}, {time: 0.15, dB: -55}, {time: 0.95, dB: -55},
+      {time: 1.0, dB: -100}]);
   scheduleOscillator('triangle', note + 24, start, duration, gain,
-    [{time:0.05, dB:-58},{time:0.15, dB:-58},{time:0.95, dB:-58},
-    {time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -58}, {time: 0.15, dB: -58}, {time: 0.95, dB: -58},
+      {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 48, start, duration, gain,
-    [{time:0.05, dB:-75},{time:0.15, dB:-75},{time:0.95, dB:-75},
-    {time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -75}, {time: 0.15, dB: -75}, {time: 0.95, dB: -75},
+      {time: 1.0, dB: -100}]);
 }
 
 function scheduleVibraphoneNote(note, start, duration, gain) {
   gain /= dBToGain(-6);
   scheduleOscillator('triangle', note, start, duration, gain,
-    [{time:0.05, dB:-3},{time:0.15, dB:-12},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -3}, {time: 0.15, dB: -12}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 12, start, duration, gain,
-    [{time:0.05, dB:-6},{time:0.15, dB:-6},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -6}, {time: 0.15, dB: -6}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 24, start, duration, gain,
-    [{time:0.05, dB:-12},{time:0.15, dB:-42},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -12}, {time: 0.15, dB: -42}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 48, start, duration, gain,
-    [{time:0.05, dB:-24},{time:0.15, dB:-54},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -24}, {time: 0.15, dB: -54}, {time: 1.0, dB: -100}]);
 }
 
 function scheduleCrotalesNote(note, start, duration, gain) {
   gain /= dBToGain(-12);
   scheduleOscillator('sine', note, start, duration, gain,
-    [{time:0.01, dB:-3},{time:0.05, dB:-30},{time:1.0, dB:-100}]);
+    [{time: 0.01, dB: -3}, {time: 0.05, dB: -30}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 12, start, duration, gain,
-    [{time:0.05, dB:-6},{time:0.15, dB:-12},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -6}, {time: 0.15, dB: -12}, {time: 1.0, dB: -100}]);
   scheduleOscillator('triangle', note + 24, start, duration, gain,
-    [{time:0.01, dB:-12},{time:0.05, dB:-30},{time:1.0, dB:-100}]);
+    [{time: 0.01, dB: -12}, {time: 0.05, dB: -30}, {time: 1.0, dB: -100}]);
   scheduleOscillator('triangle', note + 48, start, duration, gain,
-    [{time:0.01, dB:-24},{time:0.05, dB:-30},{time:1.0, dB:-100}]);
+    [{time: 0.01, dB: -24}, {time: 0.05, dB: -30}, {time: 1.0, dB: -100}]);
 }
 
 function scheduleViolinNote(note, start, duration, gain) {
   gain /= dBToGain(-55);
   scheduleOscillator('triangle', note, start, duration, gain,
-    [{time:0.05, dB:-85},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -85}, {time: 0.95, dB: -65}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sawtooth', note + 12, start, duration, gain,
-    [{time:0.05, dB:-85},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -85}, {time: 0.95, dB: -65}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 24, start, duration, gain,
-    [{time:0.2, dB:-58},{time:0.95, dB:-58},{time:1.0, dB:-100}]);
+    [{time: 0.2, dB: -58}, {time: 0.95, dB: -58}, {time: 1.0, dB: -100}]);
   scheduleOscillator('square', note + 48, start, duration, gain,
-    [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
+    [{time: 0.2, dB: -75}, {time: 0.95, dB: -75}, {time: 1.0, dB: -100}]);
 }
 
 function scheduleViolaNote(note, start, duration, gain) {
   gain /= dBToGain(-50);
   scheduleOscillator('triangle', note, start, duration, gain,
-    [{time:0.05, dB:-85},{time:0.95, dB:-65},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -85}, {time: 0.95, dB: -65}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sawtooth', note + 12, start, duration, gain,
-    [{time:0.05, dB:-75},{time:0.95, dB:-55},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -75}, {time: 0.95, dB: -55}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sine', note + 24, start, duration, gain,
-    [{time:0.2, dB:-58},{time:0.95, dB:-58},{time:1.0, dB:-100}]);
+    [{time: 0.2, dB: -58}, {time: 0.95, dB: -58}, {time: 1.0, dB: -100}]);
   scheduleOscillator('square', note + 48, start, duration, gain,
-    [{time:0.2, dB:-75},{time:0.95, dB:-75},{time:1.0, dB:-100}]);
+    [{time: 0.2, dB: -75}, {time: 0.95, dB: -75}, {time: 1.0, dB: -100}]);
 }
 
 function scheduleCelloNote(note, start, duration, gain) {
   gain /= dBToGain(-50);
   scheduleOscillator('triangle', note - 12, start, duration, gain,
-    [{time:0.05, dB:-75},{time:0.95, dB:-55},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -75}, {time: 0.95, dB: -55}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sawtooth', note, start, duration, gain,
-    [{time:0.05, dB:-75},{time:0.95, dB:-55},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -75}, {time: 0.95, dB: -55}, {time: 1.0, dB: -100}]);
 }
 
 function scheduleDoubleBassNote(note, start, duration, gain) {
   gain /= dBToGain(-50);
   scheduleOscillator('sawtooth', note - 12, start, duration, gain,
-    [{time:0.05, dB:-75},{time:0.95, dB:-55},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -75}, {time: 0.95, dB: -55}, {time: 1.0, dB: -100}]);
   scheduleOscillator('sawtooth', note, start, duration, gain,
-    [{time:0.05, dB:-75},{time:0.95, dB:-55},{time:1.0, dB:-100}]);
+    [{time: 0.05, dB: -75}, {time: 0.95, dB: -55}, {time: 1.0, dB: -100}]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -858,57 +863,35 @@ function configureReverb() {
 
   reverb = context.createReverbFromUrl(
     'http://reverbjs.org/Library/R1NuclearReactorHall.wav',
-    function() { console.log('Loaded reverb'); });
+    function () { console.log('Loaded reverb'); }
+  );
   reverbGain.connect(reverb);
   reverb.connect(masterGain);
 }
 
 function frequencyToMIDINoteNumber(frequency) {
-  var n = 12 * Math.log(frequency * Math.pow(2, 11 / 4) / 55) / Math.log(2);
-  var rounded = Math.round(n * 128) / 128;
+  var n = 12 * Math.log(frequency * Math.pow(2, 11 / 4) / 55) / Math.log(2),
+    rounded = Math.round(n * 128) / 128;
   return rounded;
 }
 
 function getPieceAsMIDI() {
   createPiece();
-  exampleData = pieceAsMIDI();
-  var csv = pieceAsCSV();
+  var pieceData = pieceAsMIDI(), csv = pieceAsCSV(), sortKey = "time";
   if (parityChecksum(csv) !== 6820566) {
-    alert('Warning: piece has changed!');
+    console.log('Warning: piece differs from original Steal This Piece');
   }
   console.log('Parity of CSV: ' + parityChecksum(csv));
-  var sortKey = "time";
-  exampleData.sort(function(a, b) {
+  pieceData.sort(function (a, b) {
     if (a[sortKey] < b[sortKey]) {
       return -1;
-    } else if (a[sortKey] > b[sortKey]) {
+    }
+    if (a[sortKey] > b[sortKey]) {
       return 1;
     }
     return 0;
   });
-  return exampleData;
-}
-
-function initialize() {
-  context = new (window.AudioContext || window.webkitAudioContext)();
-  reverbjs.extend(context);
-  predestination = context.destination;
-  configureReverb();
-  schedulePiece();
-}
-
-function processNextFrame() {
-  if (midiQueue.length === 0) {
-    return;
-  }
-  var playerCurrentTime = getCurrentTime() - playerStartTime;
-  var playerScheduleTime = playerCurrentTime + timeInAdvanceToSchedule;
-  while (midiQueue[0] !== undefined && midiQueue[0].time < playerScheduleTime) {
-    var m = midiQueue.shift();
-    scheduleInstrumentalNote(m.channel, m.pitch, m.time + playerStartTime,
-      m.duration, m.velocity);
-  }
-  window.requestAnimationFrame(processNextFrame);
+  return pieceData;
 }
 
 function scheduleInstrumentalNote(instrument, midiNoteNumber, startTime,
@@ -918,8 +901,7 @@ function scheduleInstrumentalNote(instrument, midiNoteNumber, startTime,
   } else {
     velocity = Math.min(Math.max(velocity / 127, 0.01), 1);
   }
-  var gain = 0.1 * velocity;
-  var instruments = [
+  var gain = 0.1 * velocity, instruments = [
     scheduleFluteNote,
     scheduleOboeNote,
     scheduleClarinetNote,
@@ -938,11 +920,40 @@ function scheduleInstrumentalNote(instrument, midiNoteNumber, startTime,
   instruments[instrument](midiNoteNumber, startTime, duration, gain);
 }
 
+/*global window, reverbjs*/
+
+function processNextFrame() {
+  if (midiQueue.length === 0) {
+    return;
+  }
+  var playerCurrentTime = getCurrentTime() - playerStartTime,
+    playerScheduleTime = playerCurrentTime + timeInAdvanceToSchedule,
+    m;
+  while (midiQueue[0] !== undefined && midiQueue[0].time < playerScheduleTime) {
+    m = midiQueue.shift();
+    scheduleInstrumentalNote(m.channel, m.pitch, m.time + playerStartTime,
+      m.duration, m.velocity);
+  }
+  window.requestAnimationFrame(processNextFrame);
+}
+
 function schedulePiece() {
   scheduleInstrumentalNote(0, 60, 0, 0, 0); //just to get things going
   midiQueue = getPieceAsMIDI();
   playerStartTime = getCurrentTime() + 1.0;
   processNextFrame();
+}
+
+function initialize() {
+  if (window.AudioContext) {
+    context = new window.AudioContext();
+  } else {
+    context = new window.webkitAudioContext();
+  }
+  reverbjs.extend(context);
+  predestination = context.destination;
+  configureReverb();
+  schedulePiece();
 }
 
 function shutdownGracefully() {
