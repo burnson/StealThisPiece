@@ -1,119 +1,213 @@
 'use strict';
 
 var pieceConfiguration = {
+  // Seed for the random number generator so that pieces can be reproduced.
   seed: 133,
-  loopContinueRate: 5,
-  codeLength: 10000,
+
+  // Number of instructions to generate.
+  instructionLength: 10000,
+
+  // Length of the circular buffer containing the program's state.
   tapeLength: 1024,
-  loopStep: 100,
-  loopSkipCreateRate: 3,
-  loopInnerStartLow: 100,
-  loopInnerStartHigh: 100,
-  loopInnerEndLow: 100,
-  loopInnerEndHigh: 100,
-  loopOuterEndLow: 50,
-  loopOuterEndHigh: 50,
+
+  // Number of quarter notes in longest possible note.
   longestNote: 4,
-  probabilityInversionSections: 10,
-  computationRateInversion: 0.9975,
-  range: 0,
+
+  // Additional high notes to add to instrument's default range.
+  additionalRange: 0,
+
+  // BPM of quarter note.
   tempo: 112,
+
+  // Should sixteenth durations be used?
   rhythmSixteenth: false,
+
+  // Should triplet-eight durations be used?
   rhythmTripletEighth: true,
+
+  // Should eighth durations be used?
   rhythmEighth: true,
+
+  // Should triple-quarter durations be used?
   rhythmTripletQuarter: true,
+
+  // Should quarter durations be used?
   rhythmQuarter: false,
+
+  /* If true, then making an instrument that is already at its loudest
+  any louder will instead wrap around to the softest value and vice-versa.
+  Otherwise, dynamic changes will be clipped to softest and loudest.*/
   wrapDynamics: true,
+
+  // Whether or not to use a given pitch starting with C, C sharp, D, etc.
   pitchClass: [
     true, true, true, true,
     true, true, true, true,
     true, true, true, true
   ],
+
+  // Relative probabilities of instructions.
   probabilityOf: {
-    NullOp: 0,
-    WhileBegin: 0,
-    WhileEnd: 0,
-    MoveBackward: 20000,
-    MoveForward: 20000,
-    DecrementData: 20000,
-    IncrementData: 20000,
-    DecrementDuration: 500,
-    IncrementDuration: 500,
-    EmitFlute: 40,
-    EmitOboe: 40,
-    EmitClarinet: 20,
-    EmitBassoon: 20,
-    EmitHorn: 10,
-    EmitTrumpet: 20,
-    EmitTrombone: 10,
-    EmitBaritoneSax: 50,
-    EmitVibraphone: 50,
-    EmitCrotales: 10,
-    EmitViolin: 50,
-    EmitViola: 50,
-    EmitCello: 30,
-    EmitDoubleBass: 10,
-    ToggleWinds: 100,
-    ToggleBrass: 100,
-    TogglePercussion: 100,
-    ToggleStrings: 100,
-    FluteSoft: 1,
-    FluteLoud: 1,
-    FluteSofter: 1,
-    FluteLouder: 1,
-    OboeSoft: 1,
-    OboeLoud: 1,
-    OboeSofter: 1,
-    OboeLouder: 1,
-    ClarinetSoft: 1,
-    ClarinetLoud: 1,
-    ClarinetSofter: 1,
-    ClarinetLouder: 1,
-    BassoonSoft: 1,
-    BassoonLoud: 1,
-    BassoonSofter: 1,
-    BassoonLouder: 1,
-    HornSoft: 1,
-    HornLoud: 1,
-    HornSofter: 1,
-    HornLouder: 1,
-    TrumpetSoft: 1,
-    TrumpetLoud: 1,
-    TrumpetSofter: 1,
-    TrumpetLouder: 1,
-    TromboneSoft: 1,
-    TromboneLoud: 1,
-    TromboneSofter: 1,
-    TromboneLouder: 1,
-    BaritoneSaxSoft: 1,
-    BaritoneSaxLoud: 1,
-    BaritoneSaxSofter: 1,
-    BaritoneSaxLouder: 1,
-    VibraphoneSoft: 1,
-    VibraphoneLoud: 1,
-    VibraphoneSofter: 1,
-    VibraphoneLouder: 1,
-    CrotalesSoft: 1,
-    CrotalesLoud: 1,
-    CrotalesSofter: 1,
-    CrotalesLouder: 1,
-    ViolinSoft: 1,
-    ViolinLoud: 1,
-    ViolinSofter: 1,
-    ViolinLouder: 1,
-    ViolaSoft: 1,
-    ViolaLoud: 1,
-    ViolaSofter: 1,
-    ViolaLouder: 1,
-    CelloSoft: 1,
-    CelloLoud: 1,
-    CelloSofter: 1,
-    CelloLouder: 1,
-    DoubleBassSoft: 1,
-    DoubleBassLoud: 1,
-    DoubleBassSofter: 1,
-    DoubleBassLouder: 1
+    // Probability of moving the data pointer forward or backward.
+    moveBackward: 20000,
+    moveForward: 20000,
+
+    // Probability of incrementing or decrementing the data pointed to.
+    decrementData: 20000,
+    incrementData: 20000,
+
+    // Probability of moving to next smallest or next largest rhythmic duration.
+    decrementDuration: 500,
+    incrementDuration: 500,
+
+    // Probability of emitting notes from various instruments.
+    emitFlute: 40,
+    emitOboe: 40,
+    emitClarinet: 20,
+    emitBassoon: 20,
+    emitHorn: 10,
+    emitTrumpet: 20,
+    emitTrombone: 10,
+    emitBaritoneSax: 50,
+    emitVibraphone: 50,
+    emitCrotales: 10,
+    emitViolin: 50,
+    emitViola: 50,
+    emitCello: 30,
+    emitDoubleBass: 10,
+
+    // Probabilities of toggle on and off an entire instrument section.
+    toggleWinds: 100,
+    toggleBrass: 100,
+    togglePercussion: 100,
+    toggleStrings: 100,
+
+    /* Probabilities of changing the instruments' dynamics. Soft and loud are
+    piano and forte, respectively. Softer means go down by one dynamic mark, and
+    louder means go up by one dynamic mark.*/
+    fluteSoft: 1,
+    fluteLoud: 1,
+    fluteSofter: 1,
+    fluteLouder: 1,
+    oboeSoft: 1,
+    oboeLoud: 1,
+    oboeSofter: 1,
+    oboeLouder: 1,
+    clarinetSoft: 1,
+    clarinetLoud: 1,
+    clarinetSofter: 1,
+    clarinetLouder: 1,
+    bassoonSoft: 1,
+    bassoonLoud: 1,
+    bassoonSofter: 1,
+    bassoonLouder: 1,
+    hornSoft: 1,
+    hornLoud: 1,
+    hornSofter: 1,
+    hornLouder: 1,
+    trumpetSoft: 1,
+    trumpetLoud: 1,
+    trumpetSofter: 1,
+    trumpetLouder: 1,
+    tromboneSoft: 1,
+    tromboneLoud: 1,
+    tromboneSofter: 1,
+    tromboneLouder: 1,
+    baritoneSaxSoft: 1,
+    baritoneSaxLoud: 1,
+    baritoneSaxSofter: 1,
+    baritoneSaxLouder: 1,
+    vibraphoneSoft: 1,
+    vibraphoneLoud: 1,
+    vibraphoneSofter: 1,
+    vibraphoneLouder: 1,
+    crotalesSoft: 1,
+    crotalesLoud: 1,
+    crotalesSofter: 1,
+    crotalesLouder: 1,
+    violinSoft: 1,
+    violinLoud: 1,
+    violinSofter: 1,
+    violinLouder: 1,
+    violaSoft: 1,
+    violaLoud: 1,
+    violaSofter: 1,
+    violaLouder: 1,
+    celloSoft: 1,
+    celloLoud: 1,
+    celloSofter: 1,
+    celloLouder: 1,
+    doubleBassSoft: 1,
+    doubleBassLoud: 1,
+    doubleBassSofter: 1,
+    doubleBassLouder: 1
+  },
+
+  /* All control flow is planned using nested while-loops of the form:
+  
+  while(current data byte pointed to is non-zero) {
+    ...region A...
+    ...region B...
+    while(current data byte pointed to is non-zero) {
+      ...region B cont'd...
+      ...region C...
+      ...region D...
+    }
+    ...region D cont'd...
+    ...region E...
+    ...region F...
   }
+  ...region F cont'd...
+  ...region G...
+  <...next while loop structure..>
+
+  The regions are then filled with instructions. The sizes of the regions are
+  determined by the following constants.*/
+
+  // Size of region A. The instructions here precede the inner while loop.
+  regionASize: 100,
+
+  // Size of region B. The inner while loop begins randomly within region B.
+  regionBSize: 100,
+
+  // Size of region C. The instructions here are in the inner while loop.
+  regionCSize: 100,
+
+  // Size of region D. The inner while loop ends randomly within region D.
+  regionDSize: 100,
+
+  // Size of region E. The instructions here follow the inner while loop.
+  regionESize: 50,
+
+  // Size of region F. The outer while loop ends randomly within region F.
+  regionFSize: 50,
+
+  // Size of region G. The instructions here follow the outer while loop.
+  regionGSize: 100,
+
+  /* One out of this many times, an area being considered for a nested
+  while-loop will actually have a loop created there. This is used to decrease
+  the density of looping structures in the instruction tape. A higher number
+  causes fewer loops to be created.*/
+  loopCreationRate: 3,
+
+  /* One out of this many times, the instruction pointer will probabilistically
+  fall through the end of a while loop without testing the condition. This is
+  used to prevent the instruction tape from getting stuck in an infinite loop.
+  A higher number causes loops to live for longer.*/
+  loopFallThroughRate: 5,
+
+  /* During a probability inversion section, the likelihood of
+  move backward/forward and decrement/increment data instructions is suppressed
+  (the computation-related instructions). This allows music-related instructions
+  to appear more frequently. You can disable this feature by setting the
+  computation rate inversion to zero.*/
+
+  // Percentage of computation-related probabilities to suppress when enabled.
+  computationRateInversion: 0.9975,
+
+  // Number of probability-inversion sections to use in piece.
+  probabilityInversionSections: 10
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -137,25 +231,25 @@ var PieceGenerator = function PieceGenerator(configuration) {
   this.toggles = [true, true, true, true];
 
   this.instructionSet = [
-    "NullOp", "WhileBegin", "WhileEnd", "MoveBackward", "MoveForward",
-    "DecrementData", "IncrementData", "DecrementDuration", "IncrementDuration",
-    "EmitFlute", "EmitOboe", "EmitClarinet", "EmitBassoon", "EmitHorn",
-    "EmitTrumpet", "EmitTrombone", "EmitBaritoneSax", "EmitVibraphone",
-    "EmitCrotales", "EmitViolin", "EmitViola", "EmitCello", "EmitDoubleBass",
-    "ToggleWinds", "ToggleBrass", "TogglePercussion", "ToggleStrings",
-    "FluteSoft", "FluteLoud", "FluteSofter", "FluteLouder", "OboeSoft",
-    "OboeLoud", "OboeSofter", "OboeLouder", "ClarinetSoft", "ClarinetLoud",
-    "ClarinetSofter", "ClarinetLouder", "BassoonSoft", "BassoonLoud",
-    "BassoonSofter", "BassoonLouder", "HornSoft", "HornLoud", "HornSofter",
-    "HornLouder", "TrumpetSoft", "TrumpetLoud", "TrumpetSofter",
-    "TrumpetLouder", "TromboneSoft", "TromboneLoud", "TromboneSofter",
-    "TromboneLouder", "BaritoneSaxSoft", "BaritoneSaxLoud", "BaritoneSaxSofter",
-    "BaritoneSaxLouder", "VibraphoneSoft", "VibraphoneLoud",
-    "VibraphoneSofter", "VibraphoneLouder", "CrotalesSoft", "CrotalesLoud",
-    "CrotalesSofter", "CrotalesLouder", "ViolinSoft", "ViolinLoud",
-    "ViolinSofter", "ViolinLouder", "ViolaSoft", "ViolaLoud", "ViolaSofter",
-    "ViolaLouder", "CelloSoft", "CelloLoud", "CelloSofter", "CelloLouder",
-    "DoubleBassSoft", "DoubleBassLoud", "DoubleBassSofter", "DoubleBassLouder",
+    "nullOp", "whileBegin", "whileEnd", "moveBackward", "moveForward",
+    "decrementData", "incrementData", "decrementDuration", "incrementDuration",
+    "emitFlute", "emitOboe", "emitClarinet", "emitBassoon", "emitHorn",
+    "emitTrumpet", "emitTrombone", "emitBaritoneSax", "emitVibraphone",
+    "emitCrotales", "emitViolin", "emitViola", "emitCello", "emitDoubleBass",
+    "toggleWinds", "toggleBrass", "togglePercussion", "toggleStrings",
+    "fluteSoft", "fluteLoud", "fluteSofter", "fluteLouder", "oboeSoft",
+    "oboeLoud", "oboeSofter", "oboeLouder", "clarinetSoft", "clarinetLoud",
+    "clarinetSofter", "clarinetLouder", "bassoonSoft", "bassoonLoud",
+    "bassoonSofter", "bassoonLouder", "hornSoft", "hornLoud", "hornSofter",
+    "hornLouder", "trumpetSoft", "trumpetLoud", "trumpetSofter",
+    "trumpetLouder", "tromboneSoft", "tromboneLoud", "tromboneSofter",
+    "tromboneLouder", "baritoneSaxSoft", "baritoneSaxLoud", "baritoneSaxSofter",
+    "baritoneSaxLouder", "vibraphoneSoft", "vibraphoneLoud",
+    "vibraphoneSofter", "vibraphoneLouder", "crotalesSoft", "crotalesLoud",
+    "crotalesSofter", "crotalesLouder", "violinSoft", "violinLoud",
+    "violinSofter", "violinLouder", "violaSoft", "violaLoud", "violaSofter",
+    "violaLouder", "celloSoft", "celloLoud", "celloSofter", "celloLouder",
+    "doubleBassSoft", "doubleBassLoud", "doubleBassSofter", "doubleBassLouder",
     "InstructionCount"
   ];
 
@@ -168,9 +262,8 @@ var PieceGenerator = function PieceGenerator(configuration) {
   }(this));
 
   this.distributeProbabilities = function (inversionProbability) {
-    var inversionAmount = this.piece.computationRateInversion * inversionProbability,
-      sum = 0,
-      instruction;
+    var amount, sum = 0, instruction;
+    amount = this.piece.computationRateInversion * inversionProbability;
     this.distribution = {};
     for (instruction in this.probabilities) {
       if (this.probabilities.hasOwnProperty(instruction)) {
@@ -179,10 +272,10 @@ var PieceGenerator = function PieceGenerator(configuration) {
     }
 
     // Apply probability inversion if being used.
-    this.distribution.MoveBackward -= inversionAmount * this.distribution.MoveBackward;
-    this.distribution.MoveForward -= inversionAmount * this.distribution.MoveForward;
-    this.distribution.DecrementData -= inversionAmount * this.distribution.DecrementData;
-    this.distribution.IncrementData -= inversionAmount * this.distribution.IncrementData;
+    this.distribution.moveBackward -= amount * this.distribution.moveBackward;
+    this.distribution.moveForward -= amount * this.distribution.moveForward;
+    this.distribution.decrementData -= amount * this.distribution.decrementData;
+    this.distribution.incrementData -= amount * this.distribution.incrementData;
 
     // Distribute the probabilities.
     for (instruction in this.distribution) {
@@ -232,41 +325,41 @@ var PieceGenerator = function PieceGenerator(configuration) {
   };
 
   this.createInstruments = function () {
-    var i = [];
-    i.push(this.makeInstrument(0,  0, "Flute",       67, 98 + this.piece.range)); //G4-D6
-    i.push(this.makeInstrument(1,  0, "Oboe",        60, 84 + this.piece.range)); //C4-C6
-    i.push(this.makeInstrument(2,  0, "Clarinet",    50, 79 + this.piece.range)); //D3-G5
-    i.push(this.makeInstrument(3,  0, "Bassoon",     36, 67 + this.piece.range)); //C2-G4
-    i.push(this.makeInstrument(4,  1, "Horn",        48, 72 + this.piece.range)); //C3-C5
-    i.push(this.makeInstrument(5,  1, "Trumpet",     55, 79 + this.piece.range)); //G3-G5
-    i.push(this.makeInstrument(6,  1, "Trombone",    43, 67 + this.piece.range)); //G2-G4
-    i.push(this.makeInstrument(7,  1, "BaritoneSax", 43, 60 + this.piece.range)); //G2-C4
-    i.push(this.makeInstrument(8,  2, "Vibraphone",  53, 89));               //F3-F6
-    i.push(this.makeInstrument(9,  2, "Crotales",    60, 84));               //C2-C4
-    i.push(this.makeInstrument(10, 3, "Violin",      55, 84 + this.piece.range)); //G3-C6
-    i.push(this.makeInstrument(11, 3, "Viola",       48, 79 + this.piece.range)); //C3-G5
-    i.push(this.makeInstrument(12, 3, "Cello",       36, 67 + this.piece.range)); //C2-G5
-    i.push(this.makeInstrument(13, 3, "DoubleBass",  28, 48 + this.piece.range)); //E2-C4
+    var i = [], r = this.piece.additionalRange;
+    i.push(this.makeInstrument(0,  0, "Flute",       67, 98 + r)); //G4-D6
+    i.push(this.makeInstrument(1,  0, "Oboe",        60, 84 + r)); //C4-C6
+    i.push(this.makeInstrument(2,  0, "Clarinet",    50, 79 + r)); //D3-G5
+    i.push(this.makeInstrument(3,  0, "Bassoon",     36, 67 + r)); //C2-G4
+    i.push(this.makeInstrument(4,  1, "Horn",        48, 72 + r)); //C3-C5
+    i.push(this.makeInstrument(5,  1, "Trumpet",     55, 79 + r)); //G3-G5
+    i.push(this.makeInstrument(6,  1, "Trombone",    43, 67 + r)); //G2-G4
+    i.push(this.makeInstrument(7,  1, "BaritoneSax", 43, 60 + r)); //G2-C4
+    i.push(this.makeInstrument(8,  2, "Vibraphone",  53, 89));     //F3-F6
+    i.push(this.makeInstrument(9,  2, "Crotales",    60, 84));     //C2-C4
+    i.push(this.makeInstrument(10, 3, "Violin",      55, 84 + r)); //G3-C6
+    i.push(this.makeInstrument(11, 3, "Viola",       48, 79 + r)); //C3-G5
+    i.push(this.makeInstrument(12, 3, "Cello",       36, 67 + r)); //C2-G5
+    i.push(this.makeInstrument(13, 3, "DoubleBass",  28, 48 + r)); //E2-C4
     this.instruments = i;
 
     /*Backwards compatibility to express original behavior where Violin was
-    considered part of the percussion group for toggling. This could be removed.*/
+    considered part of the percussion group for toggling. Could be removed.*/
     this.instruments[10].group = 2;
   };
 
   this.planLoops = function () {
-    var a = this.piece.loopInnerStartLow,
-      b = a + this.piece.loopInnerStartHigh,
-      c = b + this.piece.loopInnerEndLow,
-      d = c + this.piece.loopInnerEndHigh,
-      e = d + this.piece.loopOuterEndLow,
-      f = e + this.piece.loopOuterEndHigh,
-      g = f + this.piece.loopStep,
+    var a = this.piece.regionASize,
+      b = a + this.piece.regionBSize,
+      c = b + this.piece.regionCSize,
+      d = c + this.piece.regionDSize,
+      e = d + this.piece.regionESize,
+      f = e + this.piece.regionFSize,
+      g = f + this.piece.regionGSize,
       i,
-      whileBegin = this.indexOf.WhileBegin,
-      whileEnd = this.indexOf.WhileEnd;
+      whileBegin = this.indexOf.whileBegin,
+      whileEnd = this.indexOf.whileEnd;
     for (i = 0; i < this.instructions.length - g; i += 1) {
-      if (this.random.nextIntBetween(0, this.piece.loopSkipCreateRate) === 0) {
+      if (this.random.nextIntBetween(0, this.piece.loopCreationRate) === 0) {
         this.instructions[i] = whileBegin;
         this.instructions[i + this.random.nextIntBetween(e, f)] = whileEnd;
         this.instructions[i + this.random.nextIntBetween(a, b)] = whileBegin;
@@ -277,7 +370,7 @@ var PieceGenerator = function PieceGenerator(configuration) {
   };
 
   this.getProbableInstruction = function (normalizedNumber) {
-    var k, bestKey = 'NullOp', lowestValue = 2; //i.e. a number > 1
+    var k, bestKey = 'nullOp', lowestValue = 2; //i.e. a number > 1
     for (k in this.distribution) {
       if (this.distribution.hasOwnProperty(k)) {
         if (normalizedNumber < this.distribution[k] &&
@@ -297,13 +390,16 @@ var PieceGenerator = function PieceGenerator(configuration) {
         this.piece.probabilityInversionSections)) % 2);
       this.distributeProbabilities(inversionProbability);
       if (this.instructions[i] === 0) {
-        this.instructions[i] = this.getProbableInstruction(this.random.nextFloat());
+        this.instructions[i] = this.getProbableInstruction(
+          this.random.nextFloat()
+        );
       }
     }
   };
 
   this.halt = function () {
-    return this.instructionPointer >= this.instructions.length || this.instructionPointer < 0;
+    return (this.instructionPointer >= this.instructions.length ||
+      this.instructionPointer < 0);
   };
 
   this.getInstruction = function () {
@@ -311,7 +407,8 @@ var PieceGenerator = function PieceGenerator(configuration) {
   };
 
   this.getCyclicDataPointer = function () {
-    return (this.dataPointer + this.data.length * Math.abs(this.dataPointer)) % this.data.length;
+    return ((this.dataPointer + this.data.length * Math.abs(this.dataPointer)) %
+      this.data.length);
   };
 
   this.getData = function () {
@@ -408,23 +505,27 @@ var PieceGenerator = function PieceGenerator(configuration) {
   this.emit = function (i) {
     var index = this.indexOf[i], instrumentId, indexToToggle,
       dynamicId, dynamicType, dynamicInstrument, dynamicMark;
-    if (i === 'DecrementDuration') {
+    if (i === 'decrementDuration') {
       this.durationIndex = Math.max(0, this.durationIndex - 1);
-    } else if (i === 'IncrementDuration') {
-      this.durationIndex = Math.min(this.durations.length - 1, this.durationIndex + 1);
-    } else if (index >= this.indexOf.EmitFlute &&
-               index <= this.indexOf.EmitDoubleBass) {
-      instrumentId = index - this.indexOf.EmitFlute;
+    } else if (i === 'incrementDuration') {
+      this.durationIndex = Math.min(this.durations.length - 1,
+        this.durationIndex + 1
+        );
+    } else if (index >= this.indexOf.emitFlute &&
+               index <= this.indexOf.emitDoubleBass) {
+      instrumentId = index - this.indexOf.emitFlute;
       this.addNote(this.instruments[instrumentId], this.getData());
-    } else if (index >= this.indexOf.ToggleWinds &&
-               index <= this.indexOf.ToggleStrings) {
-      indexToToggle = index - this.indexOf.ToggleWinds;
+    } else if (index >= this.indexOf.toggleWinds &&
+               index <= this.indexOf.toggleStrings) {
+      indexToToggle = index - this.indexOf.toggleWinds;
       this.toggles[indexToToggle] = !this.toggles[indexToToggle];
-      if (!this.toggles[0] && !this.toggles[1] && !this.toggles[2] && !this.toggles[3]) {
+      if (!this.toggles[0] && !this.toggles[1] && !this.toggles[2] &&
+          !this.toggles[3]) {
         this.toggles = [true, true, true, true];
       }
-    } else if (index >= this.indexOf.FluteSoft && index <= this.indexOf.DoubleBassLouder) {
-      dynamicId = index - this.indexOf.FluteSoft;
+    } else if (index >= this.indexOf.fluteSoft && index <=
+        this.indexOf.doubleBassLouder) {
+      dynamicId = index - this.indexOf.fluteSoft;
       dynamicType = dynamicId % 4;
       dynamicInstrument = (dynamicId - dynamicType) / 4;
       dynamicMark = this.instruments[dynamicInstrument].dynamicMark;
@@ -454,26 +555,30 @@ var PieceGenerator = function PieceGenerator(configuration) {
       return false;
     }
     var i = this.getInstruction(), braceCount;
-    if (i === "MoveForward") {
+    if (i === "moveForward") {
       this.dataPointer += 1;
-    } else if (i === "MoveBackward") {
+    } else if (i === "moveBackward") {
       this.dataPointer -= 1;
-    } else if (i === "IncrementData") {
+    } else if (i === "incrementData") {
       this.addToData(1);
-    } else if (i === "DecrementData") {
+    } else if (i === "decrementData") {
       this.addToData(-1);
-    } else if ((i === "WhileBegin" && !this.getData()) || (i === "WhileEnd" && this.getData())) {
-      if (i !== "WhileEnd" || this.random.nextIntBetween(0, this.piece.loopContinueRate)) {
+    } else if ((i === "whileBegin" && !this.getData()) || (i === "whileEnd" &&
+        this.getData())) {
+      if (i !== "whileEnd" || this.random.nextIntBetween(0,
+          this.piece.loopFallThroughRate)) {
         //Perform jump operation to emulate while loops.
         braceCount = 1;
         do {
-          this.instructionPointer += (i === "WhileBegin" ? 1 : -1);
+          this.instructionPointer += (i === "whileBegin" ? 1 : -1);
           if (this.halt()) {
             return false;
           }
-          if (this.getInstruction() === (i === "WhileBegin" ? "WhileEnd" : "WhileBegin")) {
+          if (this.getInstruction() ===
+              (i === "whileBegin" ? "whileEnd" : "whileBegin")) {
             braceCount -= 1;
-          } else if (this.getInstruction() === (i === "WhileEnd" ? "WhileEnd" : "WhileBegin")) {
+          } else if (this.getInstruction() ===
+              (i === "whileEnd" ? "whileEnd" : "whileBegin")) {
             braceCount += 1;
           }
         } while (braceCount > 0);
@@ -563,8 +668,12 @@ var PieceGenerator = function PieceGenerator(configuration) {
 
     // Initialize state and maps.
     var i, shouldContinue = true;
-    for (i = 0; i < this.piece.codeLength; i += 1) { this.instructions[i] = 0; }
-    for (i = 0; i < this.piece.tapeLength; i += 1) { this.data[i] = 0; }
+    for (i = 0; i < this.piece.instructionLength; i += 1) {
+      this.instructions[i] = 0;
+    }
+    for (i = 0; i < this.piece.tapeLength; i += 1) {
+      this.data[i] = 0;
+    }
 
     this.planLoops();
     this.planInstructions();
@@ -991,18 +1100,3 @@ if (isRunningUnderNodeJS()) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

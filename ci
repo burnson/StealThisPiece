@@ -7,4 +7,4 @@ end
 
 verbose('npm install jslint') if !system('which jslint')
 verbose('./compare_ref_js')
-verbose('jslint --bitwise --indent 2 index-stp.js')
+verbose('jslint --bitwise --indent 2 --maxlen 80 index-stp.js')
