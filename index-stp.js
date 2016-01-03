@@ -1007,7 +1007,7 @@ var StealThisPiece = function () {
         window.PieceConfiguration.reverb + '.wav',
         function () {
           that.concert = that.context.createSourceFromUrl(
-            'http://williamandrewburnson.com/media/StealThisPiece.mp3',
+            'http://stealthispiece.com/Resources/StealThisPiece.m4a',
             function () {
               callback(that);
             }
