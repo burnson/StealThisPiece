@@ -1,12 +1,37 @@
-/*global window, reverbjs*/
-var PieceConfiguration, PieceGenerator, PiecePlayer;
+/* Steal This Piece!
 
-// Try changing some of the parameters below!
-(function () {
+  "The machine that creates a machine that creates a piece of music"
+
+  (A sort of probabilistic music program generator, that is to say,
+  not a random music generator, but a sonifier of random programs.)
+
+  dedicated to the public domain by William Andrew Burnson under the
+  Creative Commons Zero license.
+
+  The following is the entire source to Steal This Piece and is comprised of
+  a PieceConfiguration, a PieceGenerator, and a PiecePlayer. In this new
+  JavaScript port, a Web Audio API synth player is used to realize the music.
+
+  The easiest way to try it out is to change some of the parameters below
+  and see what happens.
+*/
+var StealThisPiece = function () {
   'use strict';
-  PieceConfiguration = {
+  this.PieceConfiguration = {
     // Seed for the random number generator so that pieces can be reproduced.
     seed: 133, // (integer, 0..1000000)
+
+    // BPM of quarter note.
+    tempo: 95.85, // (float, 10-1000)
+    
+    /* Reverb to use. Some good ones to try are:
+      * ElvedenHallSmokingRoom
+      * R1NuclearReactorHall
+      * StMarysAbbeyReconstructionPhase1
+      * TerrysFactoryWarehouse
+      * YorkMinster
+    See http://reverbjs.org for the full list.*/
+    reverb: 'R1NuclearReactorHall',
 
     // Number of instructions to generate.
     instructionLength: 10000, // (integer, 1..1000000)
@@ -19,9 +44,6 @@ var PieceConfiguration, PieceGenerator, PiecePlayer;
 
     // Additional high notes to add to instrument's default range.
     additionalRange: 0, // (integer, 0..36)
-
-    // BPM of quarter note.
-    tempo: 95.85, // (float, 10-1000)
 
     // Should sixteenth durations be used?
     rhythmSixteenth: false, // (true/false)
@@ -220,7 +242,7 @@ var PieceConfiguration, PieceGenerator, PiecePlayer;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  PieceGenerator = function PieceGenerator(configuration) {
+  this.PieceGenerator = function PieceGenerator(configuration) {
     this.data = [];
     this.dataPointer = 0;
     this.distribution = {};
@@ -747,39 +769,18 @@ var PieceConfiguration, PieceGenerator, PiecePlayer;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  PiecePlayer = function PiecePlayer() {
+  this.PiecePlayer = function PiecePlayer() {
+    /*global window, reverbjs*/
     this.context = null;
     this.masterGain = null;
     this.masterVolume = 0.5;
+    this.concertVolume = 0.5;
     this.midiQueue = null;
     this.playerStartTime = 0;
     this.noteOutput = null;
     this.reverb = null;
     this.reverbGain = null;
     this.timeInAdvanceToSchedule = 1.0;
-
-    this.isRunningUnderNodeJS = function () {
-      var isNodeJS = false, typeOfGlobal = typeof global;
-      if (typeOfGlobal !== "undefined") {
-        if (Object.prototype.toString.call(global.process) ===
-            '[object process]') {
-          isNodeJS = true;
-        }
-      }
-      return isNodeJS;
-    };
-
-    this.generateInConsole = function () {
-      var pieceGenerator, pieceCSV;
-      pieceGenerator = new PieceGenerator(PieceConfiguration);
-      pieceGenerator.createPiece();
-      pieceCSV = pieceGenerator.pieceAsCSV();
-      console.log('CSV of piece:\n' + pieceCSV);
-      console.log('Parity of CSV: ' + pieceGenerator.parityChecksum(pieceCSV));
-      if (pieceGenerator.parityChecksum(pieceCSV) !== 6820566) {
-        console.log('WARNING: piece does not match reference');
-      }
-    };
 
     this.dBToGain = function (dB) {
       if (dB <= -100) {
@@ -992,18 +993,29 @@ var PieceConfiguration, PieceGenerator, PiecePlayer;
       this.masterGain.gain.value = this.masterVolume;
       this.masterGain.connect(this.context.destination);
 
-      window.onbeforeunload = this.shutdownGracefully;
+      window.onbeforeunload = function () {
+        that.shutdownGracefully.apply(that)
+      };
 
       this.reverbGain = this.context.createGain();
       this.reverbGain.gain.value = 1.0;
-      this.reverbGain.connect(this.masterGain);
+      // this.reverbGain.connect(this.masterGain);
 
       this.noteOutput = this.reverbGain;
-
       this.reverb = this.context.createReverbFromUrl(
-        'http://reverbjs.org/Library/R1NuclearReactorHall.wav',
+        'http://reverbjs.org/Library/' +
+        window.PieceConfiguration.reverb + '.wav',
         function () {
-          callback(that);
+          that.concert = that.context.createSourceFromUrl(
+            'http://williamandrewburnson.com/media/StealThisPiece.mp3',
+            function () {
+              callback(that);
+            }
+          )
+          that.concertGain = that.context.createGain();
+          that.concertGain.gain.value = 0.0;
+          that.concert.connect(that.concertGain);
+          that.concertGain.connect(that.context.destination);
         }
       );
       this.reverbGain.connect(this.reverb);
@@ -1018,7 +1030,7 @@ var PieceConfiguration, PieceGenerator, PiecePlayer;
 
     this.getPieceAsMIDILikeData = function () {
       var pieceGenerator, pieceData, csv, sortKey;
-      pieceGenerator = new PieceGenerator(PieceConfiguration);
+      pieceGenerator = new window.PieceGenerator(window.PieceConfiguration);
       pieceGenerator.createPiece();
       pieceData = pieceGenerator.pieceAsMIDI();
       csv = pieceGenerator.pieceAsCSV();
@@ -1086,19 +1098,26 @@ var PieceConfiguration, PieceGenerator, PiecePlayer;
     };
 
     this.schedulePiece = function (that) {
+      var startDelay = 1.0;
       that.scheduleInstrumentalNote(0, 60, 0, 0, 0); //just to get things going
       that.midiQueue = that.getPieceAsMIDILikeData();
-      that.playerStartTime = that.getCurrentTime() + 1.0;
+      that.playerStartTime = that.getCurrentTime() + startDelay;
       that.processNextFrame();
+      window.setTimeout(function() {
+        that.concert.start();
+      }, startDelay * 1000)
     };
 
     this.initialize = function () {
       if (!this.context) {
-        if (window.AudioContext) {
+        if (window.hasOwnProperty("currentAudioContext")) {
+          this.context = window.currentAudioContext;
+        } else if (window.AudioContext) {
           this.context = new window.AudioContext();
         } else {
           this.context = new window.webkitAudioContext();
         }
+        window.currentAudioContext = this.context;
         reverbjs.extend(this.context);
       }
       this.noteOutput = this.context.destination;
@@ -1124,6 +1143,10 @@ var PieceConfiguration, PieceGenerator, PiecePlayer;
         this.masterGain.disconnect();
         this.masterGain = null;
       }
+      if (this.concertGain) {
+        this.concertGain.disconnect();
+        this.concertGain = null;
+      }
       this.midiQueue = null;
       this.playerStartTime = 0;
       if (this.noteOutput) {
@@ -1138,22 +1161,40 @@ var PieceConfiguration, PieceGenerator, PiecePlayer;
         this.reverbGain.disconnect();
         this.reverbGain = null;
       }
-      this.masterVolume = 0.5;
-      this.timeInAdvanceToSchedule = 1.0;
     };
 
     this.start = function () {
       this.stop();
       this.initialize();
     };
+
+    this.muteConcert = function(muted) {
+      var g = muted ? 0 : this.concertVolume;
+      var t = this.context.currentTime;
+      this.concertGain.gain.setValueAtTime(this.concertVolume - g, t + 0.1);
+      this.concertGain.gain.linearRampToValueAtTime(g, t + 1.0);
+    };
+
+    this.muteGenerated = function(muted) {
+      var g = muted ? 0 : this.masterVolume;
+      var t = this.context.currentTime;
+      this.masterGain.gain.setValueAtTime(this.masterVolume - g, t + 0.1);
+      this.masterGain.gain.linearRampToValueAtTime(g, t + 1.0);
+    }
   };
-}());
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-var piecePlayerInstance = new PiecePlayer();
-
-if (piecePlayerInstance.isRunningUnderNodeJS()) {
-  piecePlayerInstance.generateInConsole();
-}
+  var generateInConsoleIfRunningUnderNodeJS = function () {
+    if (typeof window === 'object') { return; }
+    var pieceGenerator, pieceCSV;
+    pieceGenerator = new this.PieceGenerator(this.PieceConfiguration);
+    pieceGenerator.createPiece();
+    pieceCSV = pieceGenerator.pieceAsCSV();
+    console.log('CSV of piece:\n' + pieceCSV);
+    console.log('Parity of CSV: ' + pieceGenerator.parityChecksum(pieceCSV));
+    if (pieceGenerator.parityChecksum(pieceCSV) !== 6820566) {
+      console.log('WARNING: piece does not match reference');
+    }
+  };
+  generateInConsoleIfRunningUnderNodeJS.apply(this);
+};
+StealThisPiece.apply(typeof window === 'object' ? window : StealThisPiece);

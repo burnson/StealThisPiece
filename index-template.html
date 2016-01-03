@@ -7,46 +7,90 @@
           href="http://fonts.googleapis.com/css?family=Inconsolata"/>
     <style></style>
     <style type="text/css" media="screen">
-      body {
-        font-family: 'Inconsolata', serif;
-      }
-      #editor {
-        position: absolute;
-        top: 80px;
-        right: 0px;
-        bottom: 0;
-        left: 0;
-      }
+body {
+  font-family: 'Inconsolata', serif;
+  background-color: #272822;
+}
+a {
+  color: #ffffff;
+}
+div {
+  color: #ffffff;
+}
+#editor {
+  position: absolute;
+  top: 90px;
+  right: 0px;
+  bottom: 0;
+  left: 0;
+}
     </style>
     <script src="http://reverbjs.org/reverb.js"
       type="text/javascript" charset="utf-8"></script>
   </head>
   <body>
     <div style="font-size: 48px;">Steal This Piece!</div>
-    <div><a href="javascript:evaluateAndRestart();">Start</a>
-      <a href="javascript:piecePlayerInstance.stop();">Stop</a></div>
-    <script>
-      /*include:index-stp.js*/
-    </script>
-<div id="editor">/*include:index-stp.js*/</div>
+    <div>
+<a href="javascript:start();">Start</a>
+<a href="javascript:stop();">Stop</a>
+<a id="concertSwitch" href="javascript:concertSwitchPressed();"></a>
+</div>
+    <div id="editor">/*include:index-stp.js*/</div>
     <script src="https://cdn.jsdelivr.net/ace/1.2.2/min/ace.js"
       type="text/javascript" charset="utf-8"></script>
     <script>
-    var jseditor;
-    function initializeEditor() {
-      jseditor = ace.edit("editor");
-      jseditor.setTheme("ace/theme/monokai");
-      jseditor.getSession().setMode("ace/mode/javascript");
-      jseditor.setHighlightActiveLine(false);
-      jseditor.setFontSize(16);
-      jseditor.setShowInvisibles(false);
-      jseditor.getSession().setTabSize(2);
-      jseditor.setShowPrintMargin(false);
-    }
-    initializeEditor();
-    function evaluateAndRestart() {
-      piecePlayerInstance.start();
-    }
+var jseditor, piece = null, useConcert = false;
+
+function initializeEditor() {
+  jseditor = ace.edit("editor");
+  jseditor.setTheme("ace/theme/monokai");
+  jseditor.getSession().setMode("ace/mode/javascript");
+  jseditor.setHighlightActiveLine(false);
+  jseditor.setFontSize(16);
+  jseditor.setShowInvisibles(false);
+  jseditor.getSession().setTabSize(2);
+  jseditor.setShowPrintMargin(false);
+}
+
+function updateConcertSwitchLabel() {
+  var label = document.getElementById('concertSwitch');
+  if (useConcert) {
+    label.text = 'Switch to Synth';
+  } else {
+    label.text = 'Switch to Concert';
+  }
+}
+
+function stop() {
+  if (!piece) { return; }
+  piece.stop();
+  piece = null;
+  useConcert = false;
+  document.getElementById('concertSwitch').text = 'Switch to Concert';
+}
+
+function start() {
+  stop();
+  eval(jseditor.getValue());
+  piece = new window.PiecePlayer();
+  piece.start();
+}
+
+function concertSwitchPressed() {
+  if (!piece) { return; }
+  useConcert = !useConcert;
+  if (useConcert) {
+    piece.muteGenerated(true);
+    piece.muteConcert(false);
+  } else {
+    piece.muteGenerated(false);
+    piece.muteConcert(true);
+  }
+  updateConcertSwitchLabel();
+}
+
+initializeEditor();
+updateConcertSwitchLabel();
     </script>
   </body>
 </html>
