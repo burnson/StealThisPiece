@@ -5,92 +5,118 @@
     <title>Steal This Piece</title>
     <link rel="stylesheet" type="text/css"
           href="http://fonts.googleapis.com/css?family=Inconsolata"/>
-    <style></style>
     <style type="text/css" media="screen">
-body {
-  font-family: 'Inconsolata', serif;
-  background-color: #272822;
-}
-a {
-  color: #ffffff;
-}
-div {
-  color: #ffffff;
-}
-#editor {
-  position: absolute;
-  top: 90px;
-  right: 0px;
-  bottom: 0;
-  left: 0;
-}
+      body {font-family: 'Inconsolata', serif; background-color: #272822;}
+      a, div {color: #ffffff;}
+      #editor {position: absolute; top: 110px; right: 0px; bottom: 0; left: 0;}
     </style>
     <script src="http://reverbjs.org/reverb.js"
-      type="text/javascript" charset="utf-8"></script>
+            type="text/javascript" charset="utf-8">
+    </script>
+    <script src="https://cdn.jsdelivr.net/ace/1.2.2/min/ace.js"
+            type="text/javascript" charset="utf-8">
+    </script>
   </head>
   <body>
-    <div style="font-size: 48px;">Steal This Piece!</div>
     <div>
-<a href="javascript:start();">Start</a>
-<a href="javascript:stop();">Stop</a>
-<a id="concertSwitch" href="javascript:concertSwitchPressed();"></a>
-</div>
+      <a href="javascript:start();">Start</a>
+      <a href="javascript:stop();">Stop</a>
+      <a id="concertId" href="javascript:concertSwitchPressed();"></a>
+      <a href="javascript:window.location='http://stealthispiece.com'">Reset</a>
+      <a href="javascript:save();">Save</a>
+      <a id="saveId" href=""></a>
+    </div>
+    <table>
+      <tr>
+      <td style="width:420px">
+        <div style="font-size: 48px;">Steal This Piece!</div>
+      </td>
+      <td>
+        <div>Quick play:
+        <a href="http://stealthispiece.com/?d23097fe383c926f01a2">Original&nbsp;Concert&nbsp;Piece</a>
+        <a href="http://stealthispiece.com/?2df1c6fce0f8b51c8f05">Short&nbsp;Ride&nbsp;in&nbsp;a&nbsp;Random&nbsp;Machine</a>
+        <a href="http://stealthispiece.com/?de6f9ad29b4dd76c9038">Lullaby</a>
+        <a href="http://stealthispiece.com/?29d083d8cabbf905f090">Arvo&nbsp;Sebastian&nbsp;Bach</a>
+        <a href="http://stealthispiece.com/?961db008e308a0fe5502">Am&nbsp;I&nbsp;Experienced?</a></div>
+      </td>
+    </table>
     <div id="editor">/*include:index-stp.js*/</div>
-    <script src="https://cdn.jsdelivr.net/ace/1.2.2/min/ace.js"
-      type="text/javascript" charset="utf-8"></script>
     <script>
-var jseditor, piece = null, useConcert = false;
-
-function initializeEditor() {
-  jseditor = ace.edit("editor");
-  jseditor.setTheme("ace/theme/monokai");
-  jseditor.getSession().setMode("ace/mode/javascript");
-  jseditor.setHighlightActiveLine(false);
-  jseditor.setFontSize(16);
-  jseditor.setShowInvisibles(false);
-  jseditor.getSession().setTabSize(2);
-  jseditor.setShowPrintMargin(false);
-}
-
-function updateConcertSwitchLabel() {
-  var label = document.getElementById('concertSwitch');
-  if (useConcert) {
-    label.text = 'Switch to Synth';
-  } else {
-    label.text = 'Switch to Concert';
-  }
-}
-
-function stop() {
-  if (!piece) { return; }
-  piece.stop();
-  piece = null;
-  useConcert = false;
-  document.getElementById('concertSwitch').text = 'Switch to Concert';
-}
-
-function start() {
-  stop();
-  eval(jseditor.getValue());
-  piece = new window.PiecePlayer();
-  piece.start();
-}
-
-function concertSwitchPressed() {
-  if (!piece) { return; }
-  useConcert = !useConcert;
-  if (useConcert) {
-    piece.muteGenerated(true);
-    piece.muteConcert(false);
-  } else {
-    piece.muteGenerated(false);
-    piece.muteConcert(true);
-  }
-  updateConcertSwitchLabel();
-}
-
-initializeEditor();
-updateConcertSwitchLabel();
+      var editor, piece = null, useConcert = false;
+      function initializeEditor() {
+        editor = ace.edit("editor");
+        editor.setTheme("ace/theme/monokai");
+        editor.getSession().setMode("ace/mode/javascript");
+        editor.setHighlightActiveLine(false);
+        editor.setFontSize(16);
+        editor.setShowInvisibles(false);
+        editor.getSession().setTabSize(2);
+        editor.setShowPrintMargin(false);
+      }
+      function updateConcertSwitchLabel() {
+        var label = document.getElementById('concertId');
+        label.text = 'Switch to ' + (useConcert ? 'Synth' : 'Concert');
+      }
+      function save() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "https://api.github.com/gists", true);
+        xhr.setRequestHeader("Content-type", "application/json;charset=utf-8");
+        xhr.onreadystatechange = function () {
+          if(xhr.readyState == 4 && xhr.status == 201) {
+            var response = JSON.parse(xhr.responseText);
+            window.location = 'http://stealthispiece.com?' + response.id;
+          }
+        }
+        xhr.send(JSON.stringify({
+          "description": "Saved piece from http://stealthispiece.com",
+          "public": false,
+          "files": { "stealthispiece.js": { "content": editor.getValue() } }
+        }));
+      }
+      function load() {
+        var saveId = window.location.search.replace('?', '');
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://api.github.com/gists/" + saveId, true);
+        xhr.setRequestHeader("Content-type", "application/json;charset=utf-8");
+        xhr.onreadystatechange = function () {
+          if(xhr.readyState == 4 && xhr.status == 200) {
+            var response = JSON.parse(xhr.responseText), i;
+            for (i in response.files) {
+              if (response.files.hasOwnProperty(i)) {
+                editor.setValue(response.files[i].content, -1);
+                start();
+                break;
+              }
+            }
+          }
+        }
+        xhr.send();
+      }
+      function stop() {
+        if (!piece) { return; }
+        piece.stop(), piece = null, useConcert = false;
+        updateConcertSwitchLabel();
+      }
+      function start() {
+        stop();
+        eval(editor.getValue());
+        (piece = new window.PiecePlayer()).start();
+      }
+      function concertSwitchPressed() {
+        if (!piece) { return; }
+        useConcert = !useConcert;
+        piece.muteGenerated(useConcert);
+        piece.muteConcert(!useConcert);
+        updateConcertSwitchLabel();
+      }
+      initializeEditor();
+      updateConcertSwitchLabel();
+      if (window.location.search != "") {
+        var saveId = document.getElementById("saveId");
+        saveId.text = window.location.href;
+        saveId.src = window.location.href;
+        load();
+      }
     </script>
   </body>
 </html>
