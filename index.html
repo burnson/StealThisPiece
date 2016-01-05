@@ -25,6 +25,7 @@
       <a href="javascript:window.location='http://stealthispiece.com'">Reset</a>
       <a href="javascript:save();">Save</a>
       <a id="saveId" href=""></a>
+      (Audio is best in Google Chrome, Safari, and Opera)
     </div>
     <table>
       <tr>
@@ -33,11 +34,11 @@
       </td>
       <td>
         <div>Quick play:
-        <a href="http://stealthispiece.com/?d23097fe383c926f01a2">Original&nbsp;Concert&nbsp;Piece</a>
-        <a href="http://stealthispiece.com/?2df1c6fce0f8b51c8f05">Short&nbsp;Ride&nbsp;in&nbsp;a&nbsp;Random&nbsp;Machine</a>
-        <a href="http://stealthispiece.com/?de6f9ad29b4dd76c9038">Lullaby</a>
-        <a href="http://stealthispiece.com/?29d083d8cabbf905f090">Arvo&nbsp;Sebastian&nbsp;Bach</a>
-        <a href="http://stealthispiece.com/?961db008e308a0fe5502">Am&nbsp;I&nbsp;Experienced?</a></div>
+        <a href="http://stealthispiece.com/?ab6463abd292be3e0172">Original&nbsp;Concert&nbsp;Piece</a>
+        <a href="http://stealthispiece.com/?c6f0f17348d60e0b9476">Short&nbsp;Ride&nbsp;in&nbsp;a&nbsp;Random&nbsp;Machine</a>
+        <a href="http://stealthispiece.com/?8cf72053ca76091da660">Lullaby</a>
+        <a href="http://stealthispiece.com/?eed0c3920dbefa677c8d">Arvo&nbsp;Sebastian&nbsp;Bach</a>
+        <a href="http://stealthispiece.com/?d7c24a4eac54df0d647b">Am&nbsp;I&nbsp;Experienced?</a></div>
       </td>
     </table>
     <div id="editor">/* Steal This Piece!
@@ -1046,7 +1047,7 @@ var StealThisPiece = function () {
       this.noteOutput = this.reverbGain;
       this.reverb = this.context.createReverbFromUrl(
         'http://reverbjs.org/Library/' +
-        window.PieceConfiguration.reverb + '.wav',
+        window.PieceConfiguration.reverb + '.m4a',
         function () {
           that.concert = that.context.createSourceFromUrl(
             'http://stealthispiece.com/Resources/StealThisPiece.m4a',
@@ -1170,10 +1171,11 @@ var StealThisPiece = function () {
       if (this.masterGain === null) {
         return;
       }
-      var start = this.getCurrentTime(), length = 0.05, progress = 0;
-      while (progress <= 1) {
+      var start = this.getCurrentTime(), length = 0.05, progress = 0, i = 0;
+      while (progress <= 1 && i < 10000) {
         this.masterGain.gain.value = (1 - progress) * this.masterVolume;
         progress = (this.getCurrentTime() - start) / length;
+        i += 1;
       }
     };
 

@@ -1004,7 +1004,7 @@ var StealThisPiece = function () {
       this.noteOutput = this.reverbGain;
       this.reverb = this.context.createReverbFromUrl(
         'http://reverbjs.org/Library/' +
-        window.PieceConfiguration.reverb + '.wav',
+        window.PieceConfiguration.reverb + '.m4a',
         function () {
           that.concert = that.context.createSourceFromUrl(
             'http://stealthispiece.com/Resources/StealThisPiece.m4a',
@@ -1128,10 +1128,11 @@ var StealThisPiece = function () {
       if (this.masterGain === null) {
         return;
       }
-      var start = this.getCurrentTime(), length = 0.05, progress = 0;
-      while (progress <= 1) {
+      var start = this.getCurrentTime(), length = 0.05, progress = 0, i = 0;
+      while (progress <= 1 && i < 10000) {
         this.masterGain.gain.value = (1 - progress) * this.masterVolume;
         progress = (this.getCurrentTime() - start) / length;
+        i += 1;
       }
     };
 
