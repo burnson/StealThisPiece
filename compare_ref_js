@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+Dir.chdir(File.expand_path(File.dirname(__FILE__)))
+system('./make_reference > ref.txt')
+system('node index-stp.js > js.txt')
+if system('diff ref.txt js.txt')
+  system('rm ref.txt js.txt')
+end

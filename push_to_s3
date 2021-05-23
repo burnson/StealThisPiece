@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+Dir.chdir(File.expand_path(File.dirname(__FILE__)))
+
+def verbose(command)
+  puts "--> #{command}"
+  system(command)
+end
+
+if ARGV.include?('--purge')
+  verbose('aws s3 rm --recursive s3://stealthispiece.com')
+end
+
+verbose('aws s3 cp index.html s3://stealthispiece.com/')
+verbose('aws s3 sync Resources s3://stealthispiece.com/Resources/')
